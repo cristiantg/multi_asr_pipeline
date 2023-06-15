@@ -1,0 +1,49 @@
+ctm2txt.py
+txt2sclite.py
+
+extract_transcription.py
+    folder + extension + input_folder
+    REMOVE_IDS=0,1,2
+extract_and_normalize.py
+
+
+
+uber.sh
+
+constants 1
+ctm2, etxstions
+
+txtc3 cdon modify
+
+0. REF preparation - SCLITE REF preparation
+0.1 ctm2txt
+0.2 txt2sclite
+
+1. kaldi_nl
+rm and
+run_kaldi_nl.py
+    DECODE
+    NORMALIZE OUTPUT
+    PREPARE HYP FILE
+    SCLITE COMMAND
+
+2. whisper-timestamped
+run_whisper_t.sh
+    DECODE
+    NORMALIZE OUTPUT
+    PREPARE HYP FILE
+    SCLITE COMMAND
+
+3. w2v2-gpu
+run_w2v2_gpu.sh
+    DECODE
+    NORMALIZE OUTPUT
+    PREPARE HYP FILE
+    SCLITE COMMAND
+
++++++++++++++++++++++++
+4. kaldi-2022v2
+
+5. kaldi-2023-v1
+
+6. kaldi-2023-v2
