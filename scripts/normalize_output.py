@@ -1,3 +1,6 @@
+#!/usr/bin/python3
+# -*- coding: utf-8 -*-
+
 import os
 
 def __list_files_with_extension(input_folder, extension):
@@ -17,7 +20,7 @@ def __read_files_write_content(file_list, extension, decoded_folder, output_path
             with open(read_file_path, 'r') as read_file:
                 hyp = ""             
                 if REMOVE_IDS==3:                
-                    os.system("python3 ctm2txt.py "+read_file_path+ " "+output_path+" "+ output_extension)
+                    os.system("python3 ctm2txt.py "+read_file_path+ " "+output_path+" "+ output_extension+" "+ CTMATOR+" "+ LEXICONATOR)
                 elif REMOVE_IDS==2:
                     print("JSON")
                     print("Now I call the cleaner(hyp)")

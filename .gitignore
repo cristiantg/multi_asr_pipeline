@@ -2,10 +2,10 @@ output*
 raw*
 transcriptions*
 scripts/history.txt
-utils/LGdir*
-utils/graph_s*
-utils/s_graph*
-utils/nivel*
+scripts/utils/LGdir*
+scripts/utils/graph_s*
+scripts/utils/s_graph*
+scripts/utils/nivel*
 
 
 

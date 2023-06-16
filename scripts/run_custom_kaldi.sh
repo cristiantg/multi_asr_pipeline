@@ -1,7 +1,7 @@
 #!/bin/bash
 
-if [ "$#" -ne 13 ]; then
-    echo "Usage: $0 kaldi_custom_output_files kaldi_cgn_path am_models input_audio_files input_audio_files_extension kaldi_custom_beam lm_models REMOVE_IDS UNK_SYMBOL output_path output_extension CTMATOR LEXICONATOR"
+if [ "$#" -ne 15 ]; then
+    echo "Usage: $0 kaldi_custom_output_files kaldi_cgn_path am_models input_audio_files input_audio_files_extension kaldi_custom_beam lm_models REMOVE_IDS UNK_SYMBOL output_path output_extension CTMATOR LEXICONATOR SCLITE sclite_ref_path "
     exit 2
 fi
 kaldi_custom_output_files="$1"
@@ -17,6 +17,8 @@ output_path="${10}"
 output_extension="${11}"
 CTMATOR="${12}"
 LEXICONATOR="${13}"
+SCLITE="${14}"
+sclite_ref_path="${15}"
 decoded_files_extension=.ctm
 sclite_hyp_file=$kaldi_custom_output_files/../hyp.txt
 
@@ -29,7 +31,7 @@ for file in "$input_audio_files"/*$input_audio_files_extension; do
     if [ -e "$file" ]; then
         filename=$(basename "$file")
         filename_without_extension="${filename%.*}"
-        #$kaldi_cgn_path/uber_single.sh $am_models $input_audio_files $filename $kaldi_custom_output_files $filename_without_extension$decoded_files_extension speaker $kaldi_custom_beam $lm_models > $kaldi_custom_output_files/$filename_without_extension.log 2>&1
+        $kaldi_cgn_path/uber_single.sh $am_models $input_audio_files $filename $kaldi_custom_output_files $filename_without_extension$decoded_files_extension speaker $kaldi_custom_beam $lm_models > $kaldi_custom_output_files/$filename_without_extension.log 2>&1
     fi
 done
 
@@ -44,3 +46,5 @@ process_audio('$input_audio_files', '$input_audio_files_extension', '$kaldi_cust
 python3 txt2sclite.py $output_path $sclite_hyp_file $output_extension
 
 # 4. SCLITE COMMAND
+m_preffix=$(basename "$lm_models")
+$SCLITE -s -i rm -r $sclite_ref_path -h $sclite_hyp_file -o all dtl -n "kaldi_custom_$m_preffix"
