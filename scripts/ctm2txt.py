@@ -10,8 +10,8 @@ if len(sys.argv) != TOTAL_ARGS_PLUS_ONE:
     # python3 ctm2txt.py INPUT_FILE OUTPUT_DIR .txt CTMATOR_PATH LEXICONATOR_PATH
     sys.exit(2)
 [INPUT_FILE, OUTPUT_DIR, OUTPUT_FILE_EXTENSION,CTMATOR, LEXICONATOR] = sys.argv[1:TOTAL_ARGS_PLUS_ONE]
-sys.path.insert(1, CTMATOR)
-sys.path.insert(1,LEXICONATOR)
+#sys.path.insert(1, CTMATOR)
+#sys.path.insert(1,LEXICONATOR)
 word_field_index=4
 
 import os
@@ -23,7 +23,7 @@ def extract_text_from_ctm(line):
     if len(fields) == 1:
         fields = line.split('\t')
     if len(fields) >= 5:
-        return nw(fields[word_field_index])
+        return nw(fields[word_field_index],CTMATOR,LEXICONATOR)
     else:
         return None
 

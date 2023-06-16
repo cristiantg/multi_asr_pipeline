@@ -2,6 +2,8 @@
 # -*- coding: utf-8 -*-
 
 import os
+from normalize_text import normalize_word as nw
+from normalize_text import normalize_line as nl
 
 def __list_files_with_extension(input_folder, extension):
     file_list = []
@@ -15,7 +17,8 @@ def __list_files_with_extension(input_folder, extension):
 def __read_files_write_content(file_list, extension, decoded_folder, output_path, output_extension, CTMATOR, LEXICONATOR, REMOVE_IDS=0, UNK_SYMBOL="<unk>"):
     REMOVE_IDS=int(REMOVE_IDS)
     for file_path in file_list:
-        read_file_path = os.path.join(decoded_folder, os.path.basename(file_path).rsplit('.', maxsplit=1)[0] + extension)
+        filename = os.path.basename(file_path).rsplit('.', maxsplit=1)[0]
+        read_file_path = os.path.join(decoded_folder, filename + extension)
         try:
             with open(read_file_path, 'r') as read_file:
                 hyp = ""             
@@ -24,12 +27,19 @@ def __read_files_write_content(file_list, extension, decoded_folder, output_path
                 elif REMOVE_IDS==2:
                     print("JSON")
                     print("Now I call the cleaner(hyp)")
-                elif REMOVE_IDS==1:
-                    print("Remove (ID)")
-                    print("Now I call the cleaner(hyp)")
                 else:
-                    print("Just join lines")
-                    print("Now I call the cleaner(hyp)")
+                    lines=[]
+                    print()
+                    print()
+                    with open(os.path.join(output_path,filename+output_extension), 'w') as file_out:
+                        for line in read_file:
+                            words=[]
+                            if REMOVE_IDS==1:
+                                line = line[:line.rfind("(")]
+                            for word in line.strip().split():
+                                words.append(nw(word,CTMATOR,LEXICONATOR))
+                            lines.append(nl(" ".join(words)))
+                        file_out.write(" ".join(lines) + '\n')
         except FileNotFoundError:
             print(f"File {read_file_path} not found.")
         except Exception as e:
