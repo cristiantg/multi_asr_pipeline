@@ -1,0 +1,240 @@
+
+final_lexicon: /vol/tensusers/ctejedor/homed_nivel/HoMed_models_final/lexicon/nivel-cgn.lex
+final_lm_compressed: /vol/tensusers/ctejedor/multi_asr_pipeline/scripts/utils/nivel-cgn-utwente_0.9.gz
+
+++ Arpa2LG.sh
+Fri Jun 16 10:50:17 CEST 2023
+utils/prepare_lang.sh --phone-symbol-table /vol/tensusers/ctejedor/multi_asr_pipeline/scripts/utils/s_graph/phones.txt /vol/tensusers/ctejedor/multi_asr_pipeline/scripts/utils/s_graph/dicttemp <unk> /vol/tensusers/ctejedor/multi_asr_pipeline/scripts/utils/s_graph/langtemp /vol/tensusers/ctejedor/multi_asr_pipeline/scripts/utils/s_graph/lang
+Checking /vol/tensusers/ctejedor/multi_asr_pipeline/scripts/utils/s_graph/dicttemp/silence_phones.txt ...
+--> reading /vol/tensusers/ctejedor/multi_asr_pipeline/scripts/utils/s_graph/dicttemp/silence_phones.txt
+--> text seems to be UTF-8 or ASCII, checking whitespaces
+--> text contains only allowed whitespaces
+--> /vol/tensusers/ctejedor/multi_asr_pipeline/scripts/utils/s_graph/dicttemp/silence_phones.txt is OK
+
+Checking /vol/tensusers/ctejedor/multi_asr_pipeline/scripts/utils/s_graph/dicttemp/optional_silence.txt ...
+--> reading /vol/tensusers/ctejedor/multi_asr_pipeline/scripts/utils/s_graph/dicttemp/optional_silence.txt
+--> text seems to be UTF-8 or ASCII, checking whitespaces
+--> text contains only allowed whitespaces
+--> /vol/tensusers/ctejedor/multi_asr_pipeline/scripts/utils/s_graph/dicttemp/optional_silence.txt is OK
+
+Checking /vol/tensusers/ctejedor/multi_asr_pipeline/scripts/utils/s_graph/dicttemp/nonsilence_phones.txt ...
+--> reading /vol/tensusers/ctejedor/multi_asr_pipeline/scripts/utils/s_graph/dicttemp/nonsilence_phones.txt
+--> text seems to be UTF-8 or ASCII, checking whitespaces
+--> text contains only allowed whitespaces
+--> /vol/tensusers/ctejedor/multi_asr_pipeline/scripts/utils/s_graph/dicttemp/nonsilence_phones.txt is OK
+
+Checking disjoint: silence_phones.txt, nonsilence_phones.txt
+--> disjoint property is OK.
+
+Checking /vol/tensusers/ctejedor/multi_asr_pipeline/scripts/utils/s_graph/dicttemp/lexiconp.txt
+--> reading /vol/tensusers/ctejedor/multi_asr_pipeline/scripts/utils/s_graph/dicttemp/lexiconp.txt
+--> text seems to be UTF-8 or ASCII, checking whitespaces
+--> text contains only allowed whitespaces
+--> /vol/tensusers/ctejedor/multi_asr_pipeline/scripts/utils/s_graph/dicttemp/lexiconp.txt is OK
+
+Checking /vol/tensusers/ctejedor/multi_asr_pipeline/scripts/utils/s_graph/dicttemp/extra_questions.txt ...
+--> /vol/tensusers/ctejedor/multi_asr_pipeline/scripts/utils/s_graph/dicttemp/extra_questions.txt is empty (this is OK)
+--> SUCCESS [validating dictionary directory /vol/tensusers/ctejedor/multi_asr_pipeline/scripts/utils/s_graph/dicttemp]
+
+**Creating /vol/tensusers/ctejedor/multi_asr_pipeline/scripts/utils/s_graph/dicttemp/lexicon.txt from /vol/tensusers/ctejedor/multi_asr_pipeline/scripts/utils/s_graph/dicttemp/lexiconp.txt
+fstaddselfloops /vol/tensusers/ctejedor/multi_asr_pipeline/scripts/utils/s_graph/lang/phones/wdisambig_phones.int /vol/tensusers/ctejedor/multi_asr_pipeline/scripts/utils/s_graph/lang/phones/wdisambig_words.int 
+prepare_lang.sh: validating output directory
+utils/validate_lang.pl /vol/tensusers/ctejedor/multi_asr_pipeline/scripts/utils/s_graph/lang
+Checking existence of separator file
+separator file /vol/tensusers/ctejedor/multi_asr_pipeline/scripts/utils/s_graph/lang/subword_separator.txt is empty or does not exist, deal in word case.
+Checking /vol/tensusers/ctejedor/multi_asr_pipeline/scripts/utils/s_graph/lang/phones.txt ...
+--> text seems to be UTF-8 or ASCII, checking whitespaces
+--> text contains only allowed whitespaces
+--> /vol/tensusers/ctejedor/multi_asr_pipeline/scripts/utils/s_graph/lang/phones.txt is OK
+
+Checking words.txt: #0 ...
+--> text seems to be UTF-8 or ASCII, checking whitespaces
+--> text contains only allowed whitespaces
+--> /vol/tensusers/ctejedor/multi_asr_pipeline/scripts/utils/s_graph/lang/words.txt is OK
+
+Checking disjoint: silence.txt, nonsilence.txt, disambig.txt ...
+--> silence.txt and nonsilence.txt are disjoint
+--> silence.txt and disambig.txt are disjoint
+--> disambig.txt and nonsilence.txt are disjoint
+--> disjoint property is OK
+
+Checking sumation: silence.txt, nonsilence.txt, disambig.txt ...
+--> found no unexplainable phones in phones.txt
+
+Checking /vol/tensusers/ctejedor/multi_asr_pipeline/scripts/utils/s_graph/lang/phones/context_indep.{txt, int, csl} ...
+--> text seems to be UTF-8 or ASCII, checking whitespaces
+--> text contains only allowed whitespaces
+--> 5 entry/entries in /vol/tensusers/ctejedor/multi_asr_pipeline/scripts/utils/s_graph/lang/phones/context_indep.txt
+--> /vol/tensusers/ctejedor/multi_asr_pipeline/scripts/utils/s_graph/lang/phones/context_indep.int corresponds to /vol/tensusers/ctejedor/multi_asr_pipeline/scripts/utils/s_graph/lang/phones/context_indep.txt
+--> /vol/tensusers/ctejedor/multi_asr_pipeline/scripts/utils/s_graph/lang/phones/context_indep.csl corresponds to /vol/tensusers/ctejedor/multi_asr_pipeline/scripts/utils/s_graph/lang/phones/context_indep.txt
+--> /vol/tensusers/ctejedor/multi_asr_pipeline/scripts/utils/s_graph/lang/phones/context_indep.{txt, int, csl} are OK
+
+Checking /vol/tensusers/ctejedor/multi_asr_pipeline/scripts/utils/s_graph/lang/phones/nonsilence.{txt, int, csl} ...
+--> text seems to be UTF-8 or ASCII, checking whitespaces
+--> text contains only allowed whitespaces
+--> 292 entry/entries in /vol/tensusers/ctejedor/multi_asr_pipeline/scripts/utils/s_graph/lang/phones/nonsilence.txt
+--> /vol/tensusers/ctejedor/multi_asr_pipeline/scripts/utils/s_graph/lang/phones/nonsilence.int corresponds to /vol/tensusers/ctejedor/multi_asr_pipeline/scripts/utils/s_graph/lang/phones/nonsilence.txt
+--> /vol/tensusers/ctejedor/multi_asr_pipeline/scripts/utils/s_graph/lang/phones/nonsilence.csl corresponds to /vol/tensusers/ctejedor/multi_asr_pipeline/scripts/utils/s_graph/lang/phones/nonsilence.txt
+--> /vol/tensusers/ctejedor/multi_asr_pipeline/scripts/utils/s_graph/lang/phones/nonsilence.{txt, int, csl} are OK
+
+Checking /vol/tensusers/ctejedor/multi_asr_pipeline/scripts/utils/s_graph/lang/phones/silence.{txt, int, csl} ...
+--> text seems to be UTF-8 or ASCII, checking whitespaces
+--> text contains only allowed whitespaces
+--> 5 entry/entries in /vol/tensusers/ctejedor/multi_asr_pipeline/scripts/utils/s_graph/lang/phones/silence.txt
+--> /vol/tensusers/ctejedor/multi_asr_pipeline/scripts/utils/s_graph/lang/phones/silence.int corresponds to /vol/tensusers/ctejedor/multi_asr_pipeline/scripts/utils/s_graph/lang/phones/silence.txt
+--> /vol/tensusers/ctejedor/multi_asr_pipeline/scripts/utils/s_graph/lang/phones/silence.csl corresponds to /vol/tensusers/ctejedor/multi_asr_pipeline/scripts/utils/s_graph/lang/phones/silence.txt
+--> /vol/tensusers/ctejedor/multi_asr_pipeline/scripts/utils/s_graph/lang/phones/silence.{txt, int, csl} are OK
+
+Checking /vol/tensusers/ctejedor/multi_asr_pipeline/scripts/utils/s_graph/lang/phones/optional_silence.{txt, int, csl} ...
+--> text seems to be UTF-8 or ASCII, checking whitespaces
+--> text contains only allowed whitespaces
+--> 1 entry/entries in /vol/tensusers/ctejedor/multi_asr_pipeline/scripts/utils/s_graph/lang/phones/optional_silence.txt
+--> /vol/tensusers/ctejedor/multi_asr_pipeline/scripts/utils/s_graph/lang/phones/optional_silence.int corresponds to /vol/tensusers/ctejedor/multi_asr_pipeline/scripts/utils/s_graph/lang/phones/optional_silence.txt
+--> /vol/tensusers/ctejedor/multi_asr_pipeline/scripts/utils/s_graph/lang/phones/optional_silence.csl corresponds to /vol/tensusers/ctejedor/multi_asr_pipeline/scripts/utils/s_graph/lang/phones/optional_silence.txt
+--> /vol/tensusers/ctejedor/multi_asr_pipeline/scripts/utils/s_graph/lang/phones/optional_silence.{txt, int, csl} are OK
+
+Checking /vol/tensusers/ctejedor/multi_asr_pipeline/scripts/utils/s_graph/lang/phones/disambig.{txt, int, csl} ...
+--> text seems to be UTF-8 or ASCII, checking whitespaces
+--> text contains only allowed whitespaces
+--> 12 entry/entries in /vol/tensusers/ctejedor/multi_asr_pipeline/scripts/utils/s_graph/lang/phones/disambig.txt
+--> /vol/tensusers/ctejedor/multi_asr_pipeline/scripts/utils/s_graph/lang/phones/disambig.int corresponds to /vol/tensusers/ctejedor/multi_asr_pipeline/scripts/utils/s_graph/lang/phones/disambig.txt
+--> /vol/tensusers/ctejedor/multi_asr_pipeline/scripts/utils/s_graph/lang/phones/disambig.csl corresponds to /vol/tensusers/ctejedor/multi_asr_pipeline/scripts/utils/s_graph/lang/phones/disambig.txt
+--> /vol/tensusers/ctejedor/multi_asr_pipeline/scripts/utils/s_graph/lang/phones/disambig.{txt, int, csl} are OK
+
+Checking /vol/tensusers/ctejedor/multi_asr_pipeline/scripts/utils/s_graph/lang/phones/roots.{txt, int} ...
+--> text seems to be UTF-8 or ASCII, checking whitespaces
+--> text contains only allowed whitespaces
+--> 74 entry/entries in /vol/tensusers/ctejedor/multi_asr_pipeline/scripts/utils/s_graph/lang/phones/roots.txt
+--> /vol/tensusers/ctejedor/multi_asr_pipeline/scripts/utils/s_graph/lang/phones/roots.int corresponds to /vol/tensusers/ctejedor/multi_asr_pipeline/scripts/utils/s_graph/lang/phones/roots.txt
+--> /vol/tensusers/ctejedor/multi_asr_pipeline/scripts/utils/s_graph/lang/phones/roots.{txt, int} are OK
+
+Checking /vol/tensusers/ctejedor/multi_asr_pipeline/scripts/utils/s_graph/lang/phones/sets.{txt, int} ...
+--> text seems to be UTF-8 or ASCII, checking whitespaces
+--> text contains only allowed whitespaces
+--> 74 entry/entries in /vol/tensusers/ctejedor/multi_asr_pipeline/scripts/utils/s_graph/lang/phones/sets.txt
+--> /vol/tensusers/ctejedor/multi_asr_pipeline/scripts/utils/s_graph/lang/phones/sets.int corresponds to /vol/tensusers/ctejedor/multi_asr_pipeline/scripts/utils/s_graph/lang/phones/sets.txt
+--> /vol/tensusers/ctejedor/multi_asr_pipeline/scripts/utils/s_graph/lang/phones/sets.{txt, int} are OK
+
+Checking /vol/tensusers/ctejedor/multi_asr_pipeline/scripts/utils/s_graph/lang/phones/extra_questions.{txt, int} ...
+--> text seems to be UTF-8 or ASCII, checking whitespaces
+--> text contains only allowed whitespaces
+--> 9 entry/entries in /vol/tensusers/ctejedor/multi_asr_pipeline/scripts/utils/s_graph/lang/phones/extra_questions.txt
+--> /vol/tensusers/ctejedor/multi_asr_pipeline/scripts/utils/s_graph/lang/phones/extra_questions.int corresponds to /vol/tensusers/ctejedor/multi_asr_pipeline/scripts/utils/s_graph/lang/phones/extra_questions.txt
+--> /vol/tensusers/ctejedor/multi_asr_pipeline/scripts/utils/s_graph/lang/phones/extra_questions.{txt, int} are OK
+
+Checking /vol/tensusers/ctejedor/multi_asr_pipeline/scripts/utils/s_graph/lang/phones/word_boundary.{txt, int} ...
+--> text seems to be UTF-8 or ASCII, checking whitespaces
+--> text contains only allowed whitespaces
+--> 297 entry/entries in /vol/tensusers/ctejedor/multi_asr_pipeline/scripts/utils/s_graph/lang/phones/word_boundary.txt
+--> /vol/tensusers/ctejedor/multi_asr_pipeline/scripts/utils/s_graph/lang/phones/word_boundary.int corresponds to /vol/tensusers/ctejedor/multi_asr_pipeline/scripts/utils/s_graph/lang/phones/word_boundary.txt
+--> /vol/tensusers/ctejedor/multi_asr_pipeline/scripts/utils/s_graph/lang/phones/word_boundary.{txt, int} are OK
+
+Checking optional_silence.txt ...
+--> reading /vol/tensusers/ctejedor/multi_asr_pipeline/scripts/utils/s_graph/lang/phones/optional_silence.txt
+--> /vol/tensusers/ctejedor/multi_asr_pipeline/scripts/utils/s_graph/lang/phones/optional_silence.txt is OK
+
+Checking disambiguation symbols: #0 and #1
+--> /vol/tensusers/ctejedor/multi_asr_pipeline/scripts/utils/s_graph/lang/phones/disambig.txt has "#0" and "#1"
+--> /vol/tensusers/ctejedor/multi_asr_pipeline/scripts/utils/s_graph/lang/phones/disambig.txt is OK
+
+Checking topo ...
+
+Checking word_boundary.txt: silence.txt, nonsilence.txt, disambig.txt ...
+--> /vol/tensusers/ctejedor/multi_asr_pipeline/scripts/utils/s_graph/lang/phones/word_boundary.txt doesn't include disambiguation symbols
+--> /vol/tensusers/ctejedor/multi_asr_pipeline/scripts/utils/s_graph/lang/phones/word_boundary.txt is the union of nonsilence.txt and silence.txt
+--> /vol/tensusers/ctejedor/multi_asr_pipeline/scripts/utils/s_graph/lang/phones/word_boundary.txt is OK
+
+Checking word-level disambiguation symbols...
+--> /vol/tensusers/ctejedor/multi_asr_pipeline/scripts/utils/s_graph/lang/phones/wdisambig.txt exists (newer prepare_lang.sh)
+Checking word_boundary.int and disambig.int
+--> generating a 34 word/subword sequence
+--> resulting phone sequence from L.fst corresponds to the word sequence
+--> L.fst is OK
+--> generating a 43 word/subword sequence
+--> resulting phone sequence from L_disambig.fst corresponds to the word sequence
+--> L_disambig.fst is OK
+
+Checking /vol/tensusers/ctejedor/multi_asr_pipeline/scripts/utils/s_graph/lang/oov.{txt, int} ...
+--> text seems to be UTF-8 or ASCII, checking whitespaces
+--> text contains only allowed whitespaces
+--> 1 entry/entries in /vol/tensusers/ctejedor/multi_asr_pipeline/scripts/utils/s_graph/lang/oov.txt
+--> /vol/tensusers/ctejedor/multi_asr_pipeline/scripts/utils/s_graph/lang/oov.int corresponds to /vol/tensusers/ctejedor/multi_asr_pipeline/scripts/utils/s_graph/lang/oov.txt
+--> /vol/tensusers/ctejedor/multi_asr_pipeline/scripts/utils/s_graph/lang/oov.{txt, int} are OK
+
+--> /vol/tensusers/ctejedor/multi_asr_pipeline/scripts/utils/s_graph/lang/L.fst is olabel sorted
+--> /vol/tensusers/ctejedor/multi_asr_pipeline/scripts/utils/s_graph/lang/L_disambig.fst is olabel sorted
+--> SUCCESS [validating lang directory /vol/tensusers/ctejedor/multi_asr_pipeline/scripts/utils/s_graph/lang]
+Converting '/vol/tensusers/ctejedor/multi_asr_pipeline/scripts/utils/nivel-cgn-utwente_0.9.gz' to FST
+arpa2fst --disambig-symbol=#0 --read-symbol-table=/vol/tensusers/ctejedor/multi_asr_pipeline/scripts/utils/s_graph/words.txt - /vol/tensusers/ctejedor/multi_asr_pipeline/scripts/utils/s_graph/G.fst 
+LOG (arpa2fst[5.5.1004~2-3b91c]:Read():arpa-file-parser.cc:94) Reading \data\ section.
+LOG (arpa2fst[5.5.1004~2-3b91c]:Read():arpa-file-parser.cc:149) Reading \1-grams: section.
+WARNING (arpa2fst[5.5.1004~2-3b91c]:Read():arpa-file-parser.cc:219) line 11 [-7.341271	'd	-0.008855872] skipped: word ''d' not in symbol table
+WARNING (arpa2fst[5.5.1004~2-3b91c]:Read():arpa-file-parser.cc:219) line 20 [-6.870803	-'s	-0.01229927] skipped: word '-'s' not in symbol table
+WARNING (arpa2fst[5.5.1004~2-3b91c]:Read():arpa-file-parser.cc:219) line 22 [-7.586832	-aanvoerder	-0.003881726] skipped: word '-aanvoerder' not in symbol table
+WARNING (arpa2fst[5.5.1004~2-3b91c]:Read():arpa-file-parser.cc:219) line 23 [-7.605288	-achterban	-0.002397011] skipped: word '-achterban' not in symbol table
+WARNING (arpa2fst[5.5.1004~2-3b91c]:Read():arpa-file-parser.cc:219) line 24 [-7.577775	-achterstand	-0.004719018] skipped: word '-achterstand' not in symbol table
+WARNING (arpa2fst[5.5.1004~2-3b91c]:Read():arpa-file-parser.cc:219) line 25 [-7.563833	-achtige	-0.004518396] skipped: word '-achtige' not in symbol table
+WARNING (arpa2fst[5.5.1004~2-3b91c]:Read():arpa-file-parser.cc:219) line 26 [-7.585876	-afdeling	-0.004298649] skipped: word '-afdeling' not in symbol table
+WARNING (arpa2fst[5.5.1004~2-3b91c]:Read():arpa-file-parser.cc:219) line 27 [-7.500618	-afvang	-0.007888959] skipped: word '-afvang' not in symbol table
+WARNING (arpa2fst[5.5.1004~2-3b91c]:Read():arpa-file-parser.cc:219) line 28 [-7.561234	-ajax	-0.001712687] skipped: word '-ajax' not in symbol table
+WARNING (arpa2fst[5.5.1004~2-3b91c]:Read():arpa-file-parser.cc:219) line 29 [-7.231824	-als	-0.007662348] skipped: word '-als' not in symbol table
+WARNING (arpa2fst[5.5.1004~2-3b91c]:Read():arpa-file-parser.cc:219) line 30 [-7.476168	-aprilgrap	-0.009896404] skipped: word '-aprilgrap' not in symbol table
+WARNING (arpa2fst[5.5.1004~2-3b91c]:Read():arpa-file-parser.cc:219) line 31 [-7.591689	-arme	-0.003438956] skipped: word '-arme' not in symbol table
+WARNING (arpa2fst[5.5.1004~2-3b91c]:Read():arpa-file-parser.cc:219) line 32 [-7.472523	-auto	-0.01017305] skipped: word '-auto' not in symbol table
+WARNING (arpa2fst[5.5.1004~2-3b91c]:Read():arpa-file-parser.cc:219) line 33 [-7.560599	-autos	-0.005216884] skipped: word '-autos' not in symbol table
+WARNING (arpa2fst[5.5.1004~2-3b91c]:Read():arpa-file-parser.cc:219) line 34 [-7.554273	-baas	-0.005225253] skipped: word '-baas' not in symbol table
+WARNING (arpa2fst[5.5.1004~2-3b91c]:Read():arpa-file-parser.cc:219) line 35 [-7.499579	-belasting	-0.007617144] skipped: word '-belasting' not in symbol table
+WARNING (arpa2fst[5.5.1004~2-3b91c]:Read():arpa-file-parser.cc:219) line 36 [-7.582401	-beleid	-0.004223736] skipped: word '-beleid' not in symbol table
+WARNING (arpa2fst[5.5.1004~2-3b91c]:Read():arpa-file-parser.cc:219) line 37 [-7.592286	-besparing	-0.003016416] skipped: word '-besparing' not in symbol table
+WARNING (arpa2fst[5.5.1004~2-3b91c]:Read():arpa-file-parser.cc:219) line 38 [-7.586359	-bestand	-0.003965191] skipped: word '-bestand' not in symbol table
+WARNING (arpa2fst[5.5.1004~2-3b91c]:Read():arpa-file-parser.cc:219) line 39 [-7.488884	-bestanden	-0.00921314] skipped: word '-bestanden' not in symbol table
+WARNING (arpa2fst[5.5.1004~2-3b91c]:Read():arpa-file-parser.cc:219) line 40 [-7.497383	-bewindslieden	-0.008196982] skipped: word '-bewindslieden' not in symbol table
+WARNING (arpa2fst[5.5.1004~2-3b91c]:Read():arpa-file-parser.cc:219) line 41 [-7.595158	-bewindsman	-0.00271822] skipped: word '-bewindsman' not in symbol table
+WARNING (arpa2fst[5.5.1004~2-3b91c]:Read():arpa-file-parser.cc:219) line 42 [-7.606844	-bewindsvrouw	-0.00188974] skipped: word '-bewindsvrouw' not in symbol table
+WARNING (arpa2fst[5.5.1004~2-3b91c]:Read():arpa-file-parser.cc:219) line 44 [-7.479049	-bijeenkomst	-0.010294] skipped: word '-bijeenkomst' not in symbol table
+WARNING (arpa2fst[5.5.1004~2-3b91c]:Read():arpa-file-parser.cc:219) line 45 [-7.513412	-bijna	-0.002228098] skipped: word '-bijna' not in symbol table
+WARNING (arpa2fst[5.5.1004~2-3b91c]:Read():arpa-file-parser.cc:219) line 46 [-7.563789	-bolide	-0.004705704] skipped: word '-bolide' not in symbol table
+WARNING (arpa2fst[5.5.1004~2-3b91c]:Read():arpa-file-parser.cc:219) line 47 [-7.488132	-bommenwerper	-0.009453876] skipped: word '-bommenwerper' not in symbol table
+WARNING (arpa2fst[5.5.1004~2-3b91c]:Read():arpa-file-parser.cc:219) line 48 [-7.483767	-bommenwerpers	-0.0095736] skipped: word '-bommenwerpers' not in symbol table
+WARNING (arpa2fst[5.5.1004~2-3b91c]:Read():arpa-file-parser.cc:219) line 49 [-7.424968	-burgemeester	-0.01004006] skipped: word '-burgemeester' not in symbol table
+WARNING (arpa2fst[5.5.1004~2-3b91c]:Read():arpa-file-parser.cc:219) line 51 [-7.586594	-carrière	-0.004077461] skipped: word '-carrière' not in symbol table
+LOG (arpa2fst[5.5.1004~2-3b91c]:Read():arpa-file-parser.cc:149) Reading \2-grams: section.
+LOG (arpa2fst[5.5.1004~2-3b91c]:Read():arpa-file-parser.cc:149) Reading \3-grams: section.
+LOG (arpa2fst[5.5.1004~2-3b91c]:Read():arpa-file-parser.cc:149) Reading \4-grams: section.
+WARNING (arpa2fst[5.5.1004~2-3b91c]:Read():arpa-file-parser.cc:259) Of 21435302 parse warnings, 30 were reported. Run program with --max-arpa-warnings=-1 to see all warnings
+LOG (arpa2fst[5.5.1004~2-3b91c]:RemoveRedundantStates():arpa-lm-compiler.cc:359) Reduced num-states from 66188537 to 7160283
+fstisstochastic /vol/tensusers/ctejedor/multi_asr_pipeline/scripts/utils/s_graph/G.fst 
+0.0818751 -1.10596
+Succeeded in formatting LM: '/vol/tensusers/ctejedor/multi_asr_pipeline/scripts/utils/nivel-cgn-utwente_0.9.gz'
+
+++ mkgraph.sh
+Fri Jun 16 10:56:51 CEST 2023
+/vol/tensusers/ctejedor/homed_nivel/HoMed_models_final/AM/tdnn1a_sp_bi_online/ --self-loop-scale 1.0 /vol/tensusers/ctejedor/multi_asr_pipeline/scripts/utils/s_graph /vol/tensusers/ctejedor/homed_nivel/HoMed_models_final/AM/tdnn1a_sp_bi_online/ /vol/tensusers/ctejedor/multi_asr_pipeline/scripts/utils/out_cgn
+tree-info /vol/tensusers/ctejedor/homed_nivel/HoMed_models_final/AM/tdnn1a_sp_bi_online//tree 
+tree-info /vol/tensusers/ctejedor/homed_nivel/HoMed_models_final/AM/tdnn1a_sp_bi_online//tree 
+fstminimizeencoded 
+fstpushspecial 
+fsttablecompose /vol/tensusers/ctejedor/multi_asr_pipeline/scripts/utils/s_graph/L_disambig.fst /vol/tensusers/ctejedor/multi_asr_pipeline/scripts/utils/s_graph/G.fst 
+fstdeterminizestar --use-log=true 
+fstisstochastic /vol/tensusers/ctejedor/multi_asr_pipeline/scripts/utils/s_graph/tmp/LG.fst 
+-0.074698 -0.0755853
+[info]: LG not stochastic.
+fstcomposecontext --context-size=2 --central-position=1 --read-disambig-syms=/vol/tensusers/ctejedor/multi_asr_pipeline/scripts/utils/s_graph/phones/disambig.int --write-disambig-syms=/vol/tensusers/ctejedor/multi_asr_pipeline/scripts/utils/s_graph/tmp/disambig_ilabels_2_1.int /vol/tensusers/ctejedor/multi_asr_pipeline/scripts/utils/s_graph/tmp/ilabels_2_1.3943279 /vol/tensusers/ctejedor/multi_asr_pipeline/scripts/utils/s_graph/tmp/LG.fst 
+fstisstochastic /vol/tensusers/ctejedor/multi_asr_pipeline/scripts/utils/s_graph/tmp/CLG_2_1.fst 
+-0.074698 -0.0755853
+[info]: CLG not stochastic.
+make-h-transducer --disambig-syms-out=/vol/tensusers/ctejedor/multi_asr_pipeline/scripts/utils/out_cgn/disambig_tid.int --transition-scale=1.0 /vol/tensusers/ctejedor/multi_asr_pipeline/scripts/utils/s_graph/tmp/ilabels_2_1 /vol/tensusers/ctejedor/homed_nivel/HoMed_models_final/AM/tdnn1a_sp_bi_online//tree /vol/tensusers/ctejedor/homed_nivel/HoMed_models_final/AM/tdnn1a_sp_bi_online//final.mdl 
+fstdeterminizestar --use-log=true 
+fstminimizeencoded 
+fsttablecompose /vol/tensusers/ctejedor/multi_asr_pipeline/scripts/utils/out_cgn/Ha.fst /vol/tensusers/ctejedor/multi_asr_pipeline/scripts/utils/s_graph/tmp/CLG_2_1.fst 
+fstrmsymbols /vol/tensusers/ctejedor/multi_asr_pipeline/scripts/utils/out_cgn/disambig_tid.int 
+fstrmepslocal 
+fstisstochastic /vol/tensusers/ctejedor/multi_asr_pipeline/scripts/utils/out_cgn/HCLGa.fst 
+0.27701 -0.30037
+HCLGa is not stochastic
+add-self-loops --self-loop-scale=1.0 --reorder=true /vol/tensusers/ctejedor/homed_nivel/HoMed_models_final/AM/tdnn1a_sp_bi_online//final.mdl /vol/tensusers/ctejedor/multi_asr_pipeline/scripts/utils/out_cgn/HCLGa.fst 
+fstisstochastic /vol/tensusers/ctejedor/multi_asr_pipeline/scripts/utils/out_cgn/HCLG.fst 
+0.128944 -0.222468
+[info]: final HCLG is not stochastic.
+9234.10user 243.74system 2:30:26elapsed 105%CPU (0avgtext+0avgdata 38332428maxresident)k
+38865552inputs+37467608outputs (601major+110781104minor)pagefaults 0swaps

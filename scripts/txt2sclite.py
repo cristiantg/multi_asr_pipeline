@@ -1,7 +1,7 @@
 #!/usr/bin/python3
 # -*- coding: utf-8 -*-
 
-# Prepares a ref/hyp file for SCLITE from a folder of files with the text 
+# Prepares a ref/hyp file for SCLITE from a folder of single-line txt files
 # transcriptions (each transcription in one line).
 
 import sys
@@ -25,6 +25,6 @@ with open(OUTPUT_SCLITE_FILE,'w') as sclite_f:
                 #print(file_id)
                 ext_files+=1
                 with open(join(INPUT_DIR, file), 'r') as f:
-                    prompt_lower = re.sub('[^a-zA-Z ]+', '',f.read().lower().replace('.',' '))
-                    sclite_f.write(re.sub(' +', ' ',prompt_lower.strip())+' ('+file_id.replace('-','_')+'-1)\n')
+                    ##prompt_lower = re.sub('[^a-zA-Z ]+', '',f.read().lower().replace('.',' '))
+                    sclite_f.write(re.sub(' +', ' ',f.read().strip())+' ('+file_id.replace('-','_')+'-1)\n')
 #print(str(ext_files),'files with the extension(s)',INPUT_EXTENSION)

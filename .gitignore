@@ -2,6 +2,12 @@ output*
 raw*
 transcriptions*
 scripts/history.txt
+utils/LGdir*
+utils/graph_s*
+utils/s_graph*
+utils/nivel*
+
+
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
