@@ -24,7 +24,7 @@ sclite_hyp_file=$kaldi_custom_output_files/../hyp.txt
 
 
 # 1. DECODE
-echo "++ run_custom_kaldi.sh ++"
+echo "++ run_custom_kaldi.sh ++" $(date)
 prev_dir=$PWD
 cd $kaldi_cgn_path
 for file in "$input_audio_files"/*$input_audio_files_extension; do
@@ -48,3 +48,5 @@ python3 txt2sclite.py $output_path $sclite_hyp_file $output_extension
 # 4. SCLITE COMMAND
 m_preffix=$(basename "$lm_models")
 $SCLITE -s -i rm -r $sclite_ref_path -h $sclite_hyp_file -o all dtl -n "kaldi_custom_$m_preffix"
+
+echo "++ run_custom_kaldi.sh finish ++" $(date)

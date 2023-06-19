@@ -49,7 +49,7 @@ echo $(date)
 local/Arpa2LG.sh $cwd/$final_lm_compressed $final_lexicon $LGdir
 
 
-HCLGdir=$cwd/s_graph && cd $KALDIdir
+HCLGdir=$cwd/graph_s && cd $KALDIdir
 echo 
 echo "++ mkgraph.sh --> Takes 2.5 hours if full-CGN"
 echo $(date)

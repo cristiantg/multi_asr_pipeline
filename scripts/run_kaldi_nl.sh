@@ -21,7 +21,7 @@ SCLITE_REF_PATH=${14}
 sclite_hyp_file=$OUTPUT_FOLDER/hyp.txt
 
 # 1. DECODE
-echo "++ run_custom_kaldi.sh ++"
+echo "++ run_kaldi_nl.sh ++" $(date)
 prev_dir=$PWD
 export KALDI_ROOT=$KALDI_LM_PATH
 cd $KALDI_NL_PATH
@@ -39,3 +39,5 @@ python3 txt2sclite.py $OUTPUT_PATH $sclite_hyp_file $OUTPUT_EXTENSION
 
 # 4. SCLITE COMMAND
 $SCLITE -s -i rm -r $SCLITE_REF_PATH -h $sclite_hyp_file -o all dtl -n "kaldi_nl"
+
+echo "++ run_kaldi_nl.sh finish ++" $(date)
