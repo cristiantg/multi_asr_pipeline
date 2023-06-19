@@ -47,6 +47,6 @@ python3 txt2sclite.py $output_path $sclite_hyp_file $output_extension
 
 # 4. SCLITE COMMAND
 m_preffix=$(basename "$lm_models")
-$SCLITE -s -i rm -r $sclite_ref_path -h $sclite_hyp_file -o all dtl -n "kaldi_custom_$m_preffix"
+$SCLITE -s -i rm -r $sclite_ref_path -h $sclite_hyp_file -o all dtl -n "kaldi_$m_preffix"
 
 echo "++ run_custom_kaldi.sh finish ++" $(date)

@@ -1,20 +1,32 @@
 #!/bin/bash
 
-# Specify the input and output directories
-input_dir="/vol/tensusers4/ctejedor/lanewcristianmachine/opt/kaldi_nl/homed_wav_3"
-output_dir="/vol/tensusers/ctejedor/multi_asr_pipeline/raw_3"
+# echo "--> Note: Best decoding options: short utterances,
+# SOX: -v 0.1, 16k 
+# ubser_single.sh: --frame-shift:0.03, no inv-acoustic-scale parameter"
 
-# Iterate over each WAV file in the input directory
-for file in "$input_dir"/*.wav; do
-  # Extract the filename without the extension
-  filename=$(basename "$file" .wav)
-  
-  # Construct the output filename with the desired sample rate
-  output_file="$output_dir/$filename.wav"
-  
-  # Use SoX to perform the sample rate conversion
-  sox "$file" -r 16000 "$output_file"
-  
-  echo "Converted: $file"
+if [[ "$#" -ne 4 ]]; then
+  echo "Usage: $0 <input_dir> <output_dir> <input_input_ext: .wav> <output_input_ext: .wav>"
+  exit 1
+fi
+input_dir="$1"
+output_dir="$2"
+input_ext="$3"
+output_ext="$4"
+SOX_VOL=0.1
+SOX_KHZ=16000
+SOX_CHANNELS=1
+SOX_BITS=16
+mkdir -p $output_dir
+
+COUNTER=0
+for file in "$input_dir"/*$input_ext; do
+  filename=$(basename "$file" $input_ext)
+  output_file="$output_dir/$filename$output_ext"
+  sox -v $SOX_VOL "$file" -r $SOX_KHZ -c $SOX_CHANNELS -b $SOX_BITS "$output_file"
+  #echo "Converted: $file"
+  COUNTER=$[$COUNTER +1]
+  echo -n "$COUNTER "
 done
 
+echo
+echo "$COUNTER files normalized with SOX"

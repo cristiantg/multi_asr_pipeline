@@ -1,5 +1,7 @@
 output*
+input*
 raw*
+nohup*
 transcriptions*
 scripts/history.txt
 scripts/utils/LGdir*
