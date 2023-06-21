@@ -40,7 +40,11 @@ process_audio('$INPUT_AUDIO_FOLDER', '$INPUT_AUDIO_FILES_EXTENSION', '$OUTPUT_FO
 # 3. PREPARE HYP FILE
 python3 txt2sclite.py $OUTPUT_PATH $sclite_hyp_file $OUTPUT_EXTENSION
 
-# 4. SCLITE COMMAND
-$SCLITE -s -i rm -r $SCLITE_REF_PATH -h $sclite_hyp_file -o all dtl -n "whisper_t"
+if [ -e "$SCLITE_REF_PATH" ]; then
+    # 4. SCLITE COMMAND
+    $SCLITE -s -i rm -r $SCLITE_REF_PATH -h $sclite_hyp_file -o all dtl -n "whisper_t"
+else
+    echo "Skipped SCLITE - whisper_t"
+fi
 
 echo "++ run_whisper_t.sh finish ++" $(date)

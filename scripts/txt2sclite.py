@@ -21,10 +21,8 @@ with open(OUTPUT_SCLITE_FILE,'w') as sclite_f:
     for file in onlyfiles:
         for ext in INPUT_EXTENSION:
             if file.endswith(ext):
-                file_id=file.split('.')[0].replace('-','_')
+                file_id=os.path.basename(file).rsplit('.', maxsplit=1)[0].replace('-','_')
                 #print(file_id)
                 ext_files+=1
                 with open(join(INPUT_DIR, file), 'r') as f:
-                    ##prompt_lower = re.sub('[^a-zA-Z ]+', '',f.read().lower().replace('.',' '))
                     sclite_f.write(re.sub(' +', ' ',f.read().strip())+' ('+file_id.replace('-','_')+'-1)\n')
-#print(str(ext_files),'files with the extension(s)',INPUT_EXTENSION)

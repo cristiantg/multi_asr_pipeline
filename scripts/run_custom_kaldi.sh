@@ -1,7 +1,7 @@
 #!/bin/bash
 
 if [ "$#" -ne 15 ]; then
-    echo "Usage: $0 kaldi_custom_output_files kaldi_cgn_path am_models input_audio_files input_audio_files_extension kaldi_custom_beam lm_models REMOVE_IDS UNK_SYMBOL output_path output_extension CTMATOR LEXICONATOR SCLITE sclite_ref_path "
+    echo "Usage: $0 kaldi_custom_output_files kaldi_cgn_path am_models input_audio_files input_audio_files_extension kaldi_custom_beam lm_models REMOVE_IDS UNK_SYMBOL output_path output_extension CTMATOR LEXICONATOR SCLITE SCLITE_REF_PATH "
     exit 2
 fi
 kaldi_custom_output_files="$1"
@@ -18,7 +18,7 @@ output_extension="${11}"
 CTMATOR="${12}"
 LEXICONATOR="${13}"
 SCLITE="${14}"
-sclite_ref_path="${15}"
+SCLITE_REF_PATH="${15}"
 decoded_files_extension=.ctm
 sclite_hyp_file=$kaldi_custom_output_files/../hyp.txt
 
@@ -45,8 +45,12 @@ process_audio('$input_audio_files', '$input_audio_files_extension', '$kaldi_cust
 # 3. PREPARE HYP FILE
 python3 txt2sclite.py $output_path $sclite_hyp_file $output_extension
 
-# 4. SCLITE COMMAND
 m_preffix=$(basename "$lm_models")
-$SCLITE -s -i rm -r $sclite_ref_path -h $sclite_hyp_file -o all dtl -n "kaldi_$m_preffix"
+if [ -e "$SCLITE_REF_PATH" ]; then
+    # 4. SCLITE COMMAND
+    $SCLITE -s -i rm -r $SCLITE_REF_PATH -h $sclite_hyp_file -o all dtl -n "kaldi_$m_preffix"
+else
+    echo "Skipped SCLITE - kaldi_$m_preffix"
+fi
 
 echo "++ run_custom_kaldi.sh finish ++" $(date)

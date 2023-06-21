@@ -28,6 +28,7 @@ cd $KALDI_NL_PATH
 $KALDI_NL_PATH/decode_OH.sh $INPUT_AUDIO_FOLDER $OUTPUT_FOLDER
 
 # 2. NORMALIZE OUTPUT
+echo "SCLITE - kaldi_nl " $(date)
 cd $prev_dir
 python3 -c "
 from normalize_output import process_audio;
@@ -37,7 +38,11 @@ process_audio('$INPUT_AUDIO_FOLDER', '$INPUT_AUDIO_FILES_EXTENSION', '$OUTPUT_FO
 # 3. PREPARE HYP FILE
 python3 txt2sclite.py $OUTPUT_PATH $sclite_hyp_file $OUTPUT_EXTENSION
 
-# 4. SCLITE COMMAND
-$SCLITE -s -i rm -r $SCLITE_REF_PATH -h $sclite_hyp_file -o all dtl -n "kaldi_nl"
+if [ -e "$SCLITE_REF_PATH" ]; then
+    # 4. SCLITE COMMAND
+    $SCLITE -s -i rm -r $SCLITE_REF_PATH -h $sclite_hyp_file -o all dtl -n "kaldi_nl"
+else
+    echo "Skipped SCLITE - kaldi_nl"
+fi
 
 echo "++ run_kaldi_nl.sh finish ++" $(date)

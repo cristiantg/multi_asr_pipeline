@@ -27,7 +27,7 @@ def extract_text_from_ctm(line):
     else:
         return None
 
-base_filename = os.path.splitext(os.path.basename(INPUT_FILE))[0]
+base_filename = os.path.basename(INPUT_FILE).rsplit('.', maxsplit=1)[0]
 output_file = os.path.join(OUTPUT_DIR, base_filename + OUTPUT_FILE_EXTENSION)
 with open(output_file, 'w') as file_out:
     with open(INPUT_FILE, 'r') as file_in:
