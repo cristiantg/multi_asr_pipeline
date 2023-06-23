@@ -1,7 +1,7 @@
 #!/bin/bash
 
-if [ "$#" -ne 14 ]; then
-    echo "Usage: $0 KALDI_LM_PATH KALDI_NL_PATH INPUT_AUDIO_FOLDER OUTPUT_FOLDER REMOVE_IDS UNK_SYMBOL output_path output_extension CTMATOR LEXICONATOR SCLITE sclite_ref_path"
+if [ "$#" -ne 16 ]; then
+    echo "Usage: $0 KALDI_LM_PATH KALDI_NL_PATH INPUT_AUDIO_FOLDER OUTPUT_FOLDER REMOVE_IDS UNK_SYMBOL output_path output_extension CTMATOR LEXICONATOR SCLITE sclite_ref_path SPLIT_CONDITION SPLIT_SYMBOL"
     exit 2
 fi
 KALDI_LM_PATH=$1
@@ -18,6 +18,8 @@ CTMATOR=${11}
 LEXICONATOR=${12}
 SCLITE=${13}
 SCLITE_REF_PATH=${14}
+SPLIT_CONDITION="${15}"
+SPLIT_SYMBOL="${16}"
 sclite_hyp_file=$OUTPUT_FOLDER/hyp.txt
 
 # 1. DECODE
@@ -36,7 +38,7 @@ process_audio('$INPUT_AUDIO_FOLDER', '$INPUT_AUDIO_FILES_EXTENSION', '$OUTPUT_FO
 "
 
 # 3. PREPARE HYP FILE
-python3 txt2sclite.py $OUTPUT_PATH $sclite_hyp_file $OUTPUT_EXTENSION
+python3 txt2sclite.py $OUTPUT_PATH $sclite_hyp_file $SPLIT_CONDITION $SPLIT_SYMBOL $OUTPUT_EXTENSION
 
 if [ -e "$SCLITE_REF_PATH" ]; then
     # 4. SCLITE COMMAND

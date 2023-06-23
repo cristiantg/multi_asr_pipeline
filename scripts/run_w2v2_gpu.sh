@@ -1,8 +1,8 @@
 #!/bin/bash
 
-if [ $# -ne 15 ]; then
+if [ $# -ne 17 ]; then
     echo "Error: Invalid number of parameters!"
-    echo "Usage: $0 INPUT_AUDIO_FOLDER INPUT_AUDIO_FILES_EXTENSION OUTPUT_FOLDER DECODED_FILES_EXTENSION W2V2_GPU_REPO W2V2_GPU_SOURCE W2V2_GPU_KEEP_ALIVE REMOVE_IDS UNK_SYMBOL OUTPUT_PATH OUTPUT_EXTENSION CTMATOR LEXICONATOR SCLITE SCLITE_REF_PATH"
+    echo "Usage: $0 INPUT_AUDIO_FOLDER INPUT_AUDIO_FILES_EXTENSION OUTPUT_FOLDER DECODED_FILES_EXTENSION W2V2_GPU_REPO W2V2_GPU_SOURCE W2V2_GPU_KEEP_ALIVE REMOVE_IDS UNK_SYMBOL OUTPUT_PATH OUTPUT_EXTENSION CTMATOR LEXICONATOR SCLITE SCLITE_REF_PATH SPLIT_CONDITION SPLIT_SYMBOL"
     exit 2
 fi
 INPUT_AUDIO_FOLDER="$1"
@@ -20,11 +20,18 @@ CTMATOR="${12}"
 LEXICONATOR="${13}"
 SCLITE="${14}"
 SCLITE_REF_PATH="${15}"
+SPLIT_CONDITION="${16}"
+SPLIT_SYMBOL="${17}"
 sclite_hyp_file=$OUTPUT_FOLDER/hyp.txt
 
 # 1. DECODE
 # Pony without GPU:
 echo "++ run_w2v2_gpu.sh ++" $(date)
+if [ -d "$W2V2_GPU_REPO/LOG" ]; then
+    # For w2v2 we use a repo that requires at least the first time, to remove 
+    # the previous log files in (from another Ponyland user):
+    rm -f $W2V2_GPU_REPO/LOG/*
+fi
 ssh pipsqueak "source $W2V2_GPU_SOURCE;python $W2V2_GPU_REPO/repo/controller.py -input_dir $INPUT_AUDIO_FOLDER -keep_alive_minutes $W2V2_GPU_KEEP_ALIVE -prepare -output_dir $OUTPUT_FOLDER "
 
 # 2. NORMALIZE OUTPUT
@@ -35,7 +42,7 @@ process_audio('$INPUT_AUDIO_FOLDER', '$INPUT_AUDIO_FILES_EXTENSION', '$OUTPUT_FO
 "
 
 # 3. PREPARE HYP FILE
-python3 txt2sclite.py $OUTPUT_PATH $sclite_hyp_file $OUTPUT_EXTENSION
+python3 txt2sclite.py $OUTPUT_PATH $sclite_hyp_file $SPLIT_CONDITION $SPLIT_SYMBOL $OUTPUT_EXTENSION
 
 if [ -e "$SCLITE_REF_PATH" ]; then
     # 4. SCLITE COMMAND

@@ -16,11 +16,12 @@
 # ******************* Mega-pipeline *********************
 
 # ssh thunderlane
+# nvidia-smi # Check whteher a GPU is free. Otherwise, change to other Pony
 # project=/vol/tensusers/ctejedor/multi_asr_pipeline/scripts && cd $project && clear && pwd
 # vim uber.sh #change the paths of the ## CONSTANTS ##  accordingly
 #       (Optional) chmod 700 ./*
 #       (Optional) rm -r nohup.out ../input ../output
-# nohup time ./uber.sh &
+# nohup time ./uber.sh >> nohup.out &
 #
 #
 # When all processes are done:
@@ -35,42 +36,34 @@
 # CTMATOR: https://github.com/cristiantg/ctmator/
 # LEXICONATOR: https://github.com/cristiantg/lexiconator
 # KALDI_CGN: https://github.com/cristiantg/kaldi_egs_CGN/tree/onPonyLand
-# For w2v2 we use a repo that requires at least the first time, to remove 
-# the previous logs in #rm -f $W2V2_GPU_REPO/LOG/*
 
 
 ############################### CONSTANTS ###############################
-# I. Must exist
-# Steps mega pipeline: [0-1] -> 1 Run, 0 Skip.
+# Steps mega pipeline, change binary values accordingly: [0-1] -> 0 Skip, 1 Run.
 normalize_sox=1; prepare_ref=1;
-kaldi_nl=1; whisper_t=1; w2v2_gpu=1; kaldi_custom_v2_2022=1; kaldi_custom_v1_2023=1; kaldi_custom_v2_2023=1
-PROJECT=/vol/tensusers/ctejedor/multi_asr_pipeline
-PROJECT_OUTPUT=$PROJECT/output
+kaldi_nl=0; whisper_t=0; w2v2_gpu=0; kaldi_custom_v2_2022=1; kaldi_custom_v1_2023=1; kaldi_custom_v2_2023=1
 
+# I. Please change the following values whenever you run this script:
+PROJECT=/vol/tensusers/ctejedor/multi_asr_pipeline # PATH TO THE GITHUB REPO
+PROJECT_SUFFIX="-arjan-split"
+PROJECT_OUTPUT=$PROJECT/output$PROJECT_SUFFIX
 ### INPUT - AUDIO FILES:
-###raw_input_audio_files=/vol/tensusers/ctejedor/multi_asr_pipeline/raw_audio_data
-###raw_input_audio_files=/vol/tensusers4/ctejedor/lanewcristianmachine/opt/kaldi_nl/homed_wav
-###raw_input_audio_files=/vol/tensusers4/ctejedor/shared/stcart/virtask-s1/converted
-###raw_input_audio_files=/vol/tensusers/ctejedor/multi_asr_pipeline/raw_arjan
-raw_input_audio_files=/vol/tensusers/ctejedor/multi_asr_pipeline/raw_2
+raw_input_audio_files=/vol/tensusers/ctejedor/multi_asr_pipeline/raw_arjan
 raw_input_audio_files_extension=.wav
-# Here the audio files will be decoded
-input_audio_files=$PROJECT/input
-input_audio_files_extension=.wav
-
+input_audio_files=$PROJECT/input$PROJECT_SUFFIX # FINAL-1: Here the audio files will be decoded
+input_audio_files_extension=.wav # Extension of the audio files to be decoded
 ### INPUT - TRANSCRIPTION FILES (optional)
 ### SET: input_transcriptions_ground_truth=- for not using SCLITE (only ASR decoding)
-input_transcriptions_ground_truth=$PROJECT/raw_transcriptions
-###input_transcriptions_ground_truth=/vol/tensusers4/ctejedor/lanewcristianmachine/opt/kaldi_nl/ctmator/ref_original
-###input_transcriptions_ground_truth=/vol/tensusers/ctejedor/multi_asr_pipeline/raw_arjan
-input_transcriptions_ground_truth_extension=.txt
-input_transcriptions_ground_truth_remove_ids="0" # extract without modification
+input_transcriptions_ground_truth=/vol/tensusers/ctejedor/multi_asr_pipeline/raw_arjan
+input_transcriptions_ground_truth_extension=.txt #.ctm or .txt
+input_transcriptions_ground_truth_remove_ids="0" # 3=CTM, 0=no modif, 1=remove slcite ids
 input_transcriptions_ground_truth_unk_symbol="<unk>"
 # Place here all single-line txt files with the std transcriptions if you alreay have them, otherwise they will be calculated
-input_transcriptions_ground_truth_std=$PROJECT/transcriptions
-input_transcriptions_ground_truth_std_extension=.txt
+input_transcriptions_ground_truth_std=$PROJECT/transcriptions$PROJECT_SUFFIX # FINAL-2: These are the single-line txt files
+input_transcriptions_ground_truth_std_extension=.txt # Extension of the single-line txt files
 
-## CHANGE JUST ONCE:
+
+## CHANGE JUST ONCE, WHEN YOU SET-UP THIS PROJCT FOR THE FIRST TIME:
 KALDI_NL_PATH=/vol/customopt/lamachine.stable/opt/kaldi_nl
 KALDI_LM_PATH=/vol/customopt/lamachine.stable/opt/kaldi
 SCLITE=$KALDI_LM_PATH/tools/sctk/bin/sclite 
@@ -110,6 +103,11 @@ kaldi_custom_v2_2023_unk_symbol="<unk>"
 OUTPUT_REF_FILE=$PROJECT_OUTPUT/ref.txt
 OUTPUT_STANDARD_TXT=output_std
 OUTPUT_STANDARD_TXT_EXTENSION=.txt
+input_split_audio_files=$input_audio_files-split
+input_split_audio_files_extension=$input_audio_files_extension
+input_split_audio_files_condition_true="1"
+input_split_audio_files_condition_false="0"
+input_split_audio_files_symbol="__"
 kaldi_nl_output=$PROJECT_OUTPUT/kaldi_nl
 kaldi_nl_output_std=$kaldi_nl_output/$OUTPUT_STANDARD_TXT
 kaldi_nl_decoded_extension=.txt
@@ -142,47 +140,65 @@ kaldi_custom_v2_2023_output_std=$kaldi_custom_v2_2023_output/$OUTPUT_STANDARD_TX
 echo
 echo $(date)
 echo "++ uber.sh script ++"
-echo " --> Each ASR step is run in the background in parallel"
+echo " --> input_audio_files: $input_audio_files"
+if [ $kaldi_custom_v2_2022 -eq 1 ] || [ $kaldi_custom_v1_2023 -eq 1 ] || [ $kaldi_custom_v2_2023 -eq 1 ]; then
+    echo " --> input_split_audio_files: $input_split_audio_files"
+    echo " --> Cleaning the previous content..."
+    rm -rf $input_split_audio_files
+fi
+echo " --> input_transcriptions_ground_truth_std: $input_transcriptions_ground_truth_std"
 echo
-
 
 if [ $normalize_sox -eq 1 ]
 then
-    echo "0.1 Preparing audio files with sox:"
-    echo " INPUT: $raw_input_audio_files"
-    echo " OUTPUT: $input_audio_files"
+    echo "+-+ 0.1 Preparing audio files with sox:"
+    echo " INPUT (raw audio): $raw_input_audio_files"
+    echo " OUTPUT (normalized audio files with sox): $input_audio_files"
     echo $(date)
-    rm -rf __pycache__ && mkdir -p $input_audio_files
-    utils/normalize_audio.sh $raw_input_audio_files $input_audio_files $raw_input_audio_files_extension $input_audio_files_extension
+    rm -rf $PROJECT/scripts/__pycache__ && mkdir -p $input_audio_files
+    $PROJECT/scripts/utils/normalize_audio.sh "$raw_input_audio_files" "$input_audio_files" "$raw_input_audio_files_extension" "$input_audio_files_extension"
+    echo "--> Note: Audio files will be split in segments later only if you selected custom Kaldi ASR decoding"
     echo "--> Done " $(date)
     echo
 else
     echo "0.1 --> Skipped"
 fi
 
+if [ $kaldi_custom_v2_2022 -eq 1 ] || [ $kaldi_custom_v1_2023 -eq 1 ] || [ $kaldi_custom_v2_2023 -eq 1 ]; then
+    echo "+-+ 0.1.1 Split audio files with sox:"
+    echo $(date)
+    $PROJECT/scripts/utils/audio_split.sh "$input_audio_files" "$input_audio_files_extension" "$input_split_audio_files" "$input_split_audio_files_extension" "$input_split_audio_files_symbol"
+    echo "--> Done " $(date)
+else
+    echo "0.1.1 --> Skipped"
+fi
+
 
 if [ $prepare_ref -eq 1 ] &&  [ "$input_transcriptions_ground_truth" != "-" ];
 then
     echo
-    echo "0.2 SCLITE ref file preparation" $(date)
-    echo "-> This step is not recommended to be executed more than one time at the same time (a temporal file is created for mapping digits)"
+    echo "+-+ 0.2 SCLITE ref file preparation" $(date)
+    echo "-> This step is not recommended to be executed more than one time at the same time"
+    echo "-> A temporal file is created for mapping digits (and will be automatically deleted)"
     ## rm -rf $PROJECT_OUTPUT ## Very dangerous --> Do it manually
     mkdir -p $PROJECT_OUTPUT $input_transcriptions_ground_truth_std
     # Takes the "raw transcription files" and prepares a single ref.file with all txt files in "transcriptions" folder
-    echo "-> Normalizing transcriptions (step 1/2) ..."
+    echo "-> Normalizing transcriptions (step 1/2) output2txt ..."
     python3 -c "from normalize_output import process_audio; process_audio('$input_audio_files', '$input_audio_files_extension','$input_transcriptions_ground_truth', '$input_transcriptions_ground_truth_extension','$input_transcriptions_ground_truth_remove_ids', '$input_transcriptions_ground_truth_unk_symbol','$input_transcriptions_ground_truth_std', '$input_transcriptions_ground_truth_std_extension', '$CTMATOR', '$LEXICONATOR')"
-    echo "-> Normalizing transcriptions (step 2/2) ..."
-    python3 txt2sclite.py $input_transcriptions_ground_truth_std $OUTPUT_REF_FILE $input_transcriptions_ground_truth_std_extension
+    echo "-> Normalizing transcriptions (step 2/2) txt2sclite ..."
+    python3 $PROJECT/scripts/txt2sclite.py $input_transcriptions_ground_truth_std $OUTPUT_REF_FILE $input_split_audio_files_condition_false $input_split_audio_files_symbol $input_transcriptions_ground_truth_std_extension
+    echo "--> Done " $(date)
 else
     echo "0.2 --> Skipped"
 fi
 
+echo
 
 if [ $kaldi_nl -eq 1 ]
 then
-    echo "1. KALDI_NL" $(date)
+    echo "+-+ 1. KALDI_NL" $(date)
     mkdir -p $kaldi_nl_output $kaldi_nl_output_std
-    nohup time ./run_kaldi_nl.sh $KALDI_LM_PATH $KALDI_NL_PATH $input_audio_files $input_audio_files_extension $kaldi_nl_output $kaldi_nl_decoded_extension $kaldi_nl_remove_ids $kaldi_nl_unk_symbol $kaldi_nl_output_std $OUTPUT_STANDARD_TXT_EXTENSION $CTMATOR $LEXICONATOR $SCLITE $OUTPUT_REF_FILE >> $kaldi_nl_nohup &
+    nohup time $PROJECT/scripts/run_kaldi_nl.sh $KALDI_LM_PATH $KALDI_NL_PATH $input_audio_files $input_audio_files_extension $kaldi_nl_output $kaldi_nl_decoded_extension $kaldi_nl_remove_ids $kaldi_nl_unk_symbol $kaldi_nl_output_std $OUTPUT_STANDARD_TXT_EXTENSION $CTMATOR $LEXICONATOR $SCLITE $OUTPUT_REF_FILE $input_split_audio_files_condition_false $input_split_audio_files_symbol >> $kaldi_nl_nohup &
 else
     echo "1 --> Skipped"
 fi
@@ -190,9 +206,9 @@ fi
 
 if [ $whisper_t -eq 1 ]
 then
-    echo "2. WHISPER-TIMESTAMPED" $(date)
+    echo "+-+ 2. WHISPER-TIMESTAMPED" $(date)
     mkdir -p $whisper_t_output $whisper_t_output_std
-    nohup time ./run_whisper_t.sh $WHISPER_T_PATH $input_audio_files $input_audio_files_extension $whisper_t_output $whisper_t_decoded_extension $WHISPER_T_MODEL $WHISPER_T_MODELS $WHISPER_T_LANG $WHISPER_T_PROMPTS_PATH $whisper_t_remove_ids $whisper_t_unk_symbol $whisper_t_output_std $OUTPUT_STANDARD_TXT_EXTENSION $CTMATOR $LEXICONATOR $SCLITE $OUTPUT_REF_FILE >> $whisper_t_nohup &
+    nohup time $PROJECT/scripts/run_whisper_t.sh $WHISPER_T_PATH $input_audio_files $input_audio_files_extension $whisper_t_output $whisper_t_decoded_extension $WHISPER_T_MODEL $WHISPER_T_MODELS $WHISPER_T_LANG $WHISPER_T_PROMPTS_PATH $whisper_t_remove_ids $whisper_t_unk_symbol $whisper_t_output_std $OUTPUT_STANDARD_TXT_EXTENSION $CTMATOR $LEXICONATOR $SCLITE $OUTPUT_REF_FILE $input_split_audio_files_condition_false $input_split_audio_files_symbol >> $whisper_t_nohup &
 else
     echo "2 --> Skipped"
 fi
@@ -200,36 +216,36 @@ fi
 
 if [ $w2v2_gpu -eq 1 ]
 then
-    echo "3. WAV2VEC2.0" $(date)
+    echo "+-+ 3. WAV2VEC2.0" $(date)
     mkdir -p $w2v2_gpu_output $w2v2_gpu_output_std
-    nohup time ./run_w2v2_gpu.sh $input_audio_files $input_audio_files_extension $w2v2_gpu_output $w2v2_gpu_decoded_extension $W2V2_GPU_REPO $W2V2_GPU_SOURCE $W2V2_GPU_KEEP_ALIVE $w2v2_gpu_remove_ids $w2v2_gpu_unk_symbol $w2v2_gpu_output_std $OUTPUT_STANDARD_TXT_EXTENSION $CTMATOR $LEXICONATOR $SCLITE $OUTPUT_REF_FILE >> $w2v2_gpu_nohup &
+    nohup time $PROJECT/scripts/run_w2v2_gpu.sh $input_audio_files $input_audio_files_extension $w2v2_gpu_output $w2v2_gpu_decoded_extension $W2V2_GPU_REPO $W2V2_GPU_SOURCE $W2V2_GPU_KEEP_ALIVE $w2v2_gpu_remove_ids $w2v2_gpu_unk_symbol $w2v2_gpu_output_std $OUTPUT_STANDARD_TXT_EXTENSION $CTMATOR $LEXICONATOR $SCLITE $OUTPUT_REF_FILE $input_split_audio_files_condition_false $input_split_audio_files_symbol >> $w2v2_gpu_nohup &
 else
     echo "3 --> Skipped"
 fi
 
 if [ $kaldi_custom_v2_2022 -eq 1 ]
 then
-    echo "4. KALDI_CUSTOM: HoMed-v2_2022" $(date)
+    echo "+-+ 4. KALDI_CUSTOM: HoMed-v2_2022" $(date)
     mkdir -p $kaldi_custom_v2_2022_output $kaldi_custom_v2_2022_output_files $kaldi_custom_v2_2022_output_std
-    nohup time ./run_custom_kaldi.sh $kaldi_custom_v2_2022_output_files $KALDI_CGN $kaldi_custom_am_models_v2_2022 $input_audio_files $input_audio_files_extension $kaldi_custom_v2_2022_beam $kaldi_custom_lm_models_v2_2022 $kaldi_custom_v2_2022_remove_ids $kaldi_custom_v2_2022_unk_symbol $kaldi_custom_v2_2022_output_std $OUTPUT_STANDARD_TXT_EXTENSION $CTMATOR $LEXICONATOR $SCLITE $OUTPUT_REF_FILE >> $kaldi_custom_v2_2022_nohup &
+    nohup time $PROJECT/scripts/run_custom_kaldi.sh $kaldi_custom_v2_2022_output_files $KALDI_CGN $kaldi_custom_am_models_v2_2022 $input_split_audio_files $input_split_audio_files_extension $kaldi_custom_v2_2022_beam $kaldi_custom_lm_models_v2_2022 $kaldi_custom_v2_2022_remove_ids $kaldi_custom_v2_2022_unk_symbol $kaldi_custom_v2_2022_output_std $OUTPUT_STANDARD_TXT_EXTENSION $CTMATOR $LEXICONATOR $SCLITE $OUTPUT_REF_FILE $input_split_audio_files_condition_true $input_split_audio_files_symbol >> $kaldi_custom_v2_2022_nohup &
 else
     echo "4 --> Skipped"
 fi
 
 if [ $kaldi_custom_v1_2023 -eq 1 ]
 then
-    echo "5. KALDI_CUSTOM: HoMed-v1_2023: nivel-cgn.lex + utwente_0.2" $(date)
+    echo "+-+ 5. KALDI_CUSTOM: HoMed-v1_2023: nivel-cgn.lex + utwente_0.2" $(date)
     mkdir -p $kaldi_custom_v1_2023_output $kaldi_custom_v1_2023_output_files $kaldi_custom_v1_2023_output_std
-    nohup time ./run_custom_kaldi.sh $kaldi_custom_v1_2023_output_files $KALDI_CGN $kaldi_custom_am_models_v1_2023 $input_audio_files $input_audio_files_extension $kaldi_custom_v1_2023_beam $kaldi_custom_lm_models_v1_2023 $kaldi_custom_v1_2023_remove_ids $kaldi_custom_v1_2023_unk_symbol $kaldi_custom_v1_2023_output_std $OUTPUT_STANDARD_TXT_EXTENSION $CTMATOR $LEXICONATOR $SCLITE $OUTPUT_REF_FILE >> $kaldi_custom_v1_2023_nohup &
+    nohup time $PROJECT/scripts/run_custom_kaldi.sh $kaldi_custom_v1_2023_output_files $KALDI_CGN $kaldi_custom_am_models_v1_2023 $input_split_audio_files $input_split_audio_files_extension $kaldi_custom_v1_2023_beam $kaldi_custom_lm_models_v1_2023 $kaldi_custom_v1_2023_remove_ids $kaldi_custom_v1_2023_unk_symbol $kaldi_custom_v1_2023_output_std $OUTPUT_STANDARD_TXT_EXTENSION $CTMATOR $LEXICONATOR $SCLITE $OUTPUT_REF_FILE $input_split_audio_files_condition_true $input_split_audio_files_symbol >> $kaldi_custom_v1_2023_nohup &
 else
     echo "5 --> Skipped"
 fi
 
 if [ $kaldi_custom_v2_2023 -eq 1 ]
 then
-    echo "6. KALDI_CUSTOM: HoMed-v2_2023: nivel-cgn.lex + utwente_0.9" $(date)
+    echo "+-+ 6. KALDI_CUSTOM: HoMed-v2_2023: nivel-cgn.lex + utwente_0.9" $(date)
     mkdir -p $kaldi_custom_v2_2023_output $kaldi_custom_v2_2023_output_files $kaldi_custom_v2_2023_output_std
-    nohup time ./run_custom_kaldi.sh $kaldi_custom_v2_2023_output_files $KALDI_CGN $kaldi_custom_am_models_v2_2023 $input_audio_files $input_audio_files_extension $kaldi_custom_v2_2023_beam $kaldi_custom_lm_models_v2_2023 $kaldi_custom_v2_2023_remove_ids $kaldi_custom_v2_2023_unk_symbol $kaldi_custom_v2_2023_output_std $OUTPUT_STANDARD_TXT_EXTENSION $CTMATOR $LEXICONATOR $SCLITE $OUTPUT_REF_FILE >> $kaldi_custom_v2_2023_nohup &
+    nohup time $PROJECT/scripts/run_custom_kaldi.sh $kaldi_custom_v2_2023_output_files $KALDI_CGN $kaldi_custom_am_models_v2_2023 $input_split_audio_files $input_split_audio_files_extension $kaldi_custom_v2_2023_beam $kaldi_custom_lm_models_v2_2023 $kaldi_custom_v2_2023_remove_ids $kaldi_custom_v2_2023_unk_symbol $kaldi_custom_v2_2023_output_std $OUTPUT_STANDARD_TXT_EXTENSION $CTMATOR $LEXICONATOR $SCLITE $OUTPUT_REF_FILE $input_split_audio_files_condition_true $input_split_audio_files_symbol >> $kaldi_custom_v2_2023_nohup &
 else
     echo "6 --> Skipped"
 fi
@@ -238,6 +254,19 @@ fi
 
 echo
 echo
+echo "Once all ASR systems are done, you might run:"
+echo "$PROJECT/scripts/utils/summary_sclite.sh $PROJECT_OUTPUT $PROJECT_OUTPUT/summary.txt"
+echo
 echo $(date)
 echo "++ uber.sh script finished correctly ++"
 echo
+
+
+###raw_input_audio_files=/vol/tensusers/ctejedor/multi_asr_pipeline/raw_audio_data
+###raw_input_audio_files=/vol/tensusers4/ctejedor/lanewcristianmachine/opt/kaldi_nl/homed_wav
+###raw_input_audio_files=/vol/tensusers4/ctejedor/shared/stcart/virtask-s1/converted
+###raw_input_audio_files=/vol/tensusers/ctejedor/multi_asr_pipeline/raw_arjan
+###raw_input_audio_files=/vol/tensusers/ctejedor/multi_asr_pipeline/raw_2 # Path to your raw audio data
+###input_transcriptions_ground_truth=$PROJECT/raw_transcriptions
+###input_transcriptions_ground_truth=/vol/tensusers4/ctejedor/lanewcristianmachine/opt/kaldi_nl/ctmator/ref_original
+###input_transcriptions_ground_truth=/vol/tensusers/ctejedor/multi_asr_pipeline/raw_arjan
