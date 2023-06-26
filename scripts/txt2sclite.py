@@ -54,4 +54,8 @@ with open(OUTPUT_SCLITE_FILE,'w') as sclite_f:
     else:
         for file_id in final_files:
             aux_dict=final_files[file_id]
+            #print("aux_dict",aux_dict)
+            #print()
+            #m_mapsorted = sorted(aux_dict.keys())
+            #print(m_mapsorted)
             sclite_f.write(' '.join([aux_dict[key] for key in sorted(aux_dict.keys())])+' ('+file_id.replace('-','_')+'-1)\n')

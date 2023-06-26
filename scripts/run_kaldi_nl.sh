@@ -42,7 +42,7 @@ python3 txt2sclite.py $OUTPUT_PATH $sclite_hyp_file $SPLIT_CONDITION $SPLIT_SYMB
 
 if [ -e "$SCLITE_REF_PATH" ]; then
     # 4. SCLITE COMMAND
-    $SCLITE -s -i rm -r $SCLITE_REF_PATH -h $sclite_hyp_file -o all dtl -n "kaldi_nl"
+    $SCLITE -s -i rm -r $SCLITE_REF_PATH -h $sclite_hyp_file -o all dtl -n "_kaldi_nl"
 else
     echo "Skipped SCLITE - kaldi_nl"
 fi

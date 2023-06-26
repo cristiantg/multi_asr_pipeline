@@ -21,7 +21,7 @@
 # vim uber.sh #change the paths of the ## CONSTANTS ##  accordingly
 #       (Optional) chmod 700 ./*
 #       (Optional) rm -r nohup.out ../input ../output
-# nohup time ./uber.sh >> nohup.out &
+# nohup time ./uber.sh >> nohup-kk-arjan.out &
 #
 #
 # When all processes are done:
@@ -41,20 +41,22 @@
 ############################### CONSTANTS ###############################
 # Steps mega pipeline, change binary values accordingly: [0-1] -> 0 Skip, 1 Run.
 normalize_sox=1; prepare_ref=1;
-kaldi_nl=0; whisper_t=0; w2v2_gpu=0; kaldi_custom_v2_2022=1; kaldi_custom_v1_2023=1; kaldi_custom_v2_2023=1
+kaldi_nl=1; whisper_t=1; w2v2_gpu=1; kaldi_custom_v2_2022=0; kaldi_custom_v1_2023=0; kaldi_custom_v2_2023=0
 
 # I. Please change the following values whenever you run this script:
 PROJECT=/vol/tensusers/ctejedor/multi_asr_pipeline # PATH TO THE GITHUB REPO
-PROJECT_SUFFIX="-arjan-split"
+PROJECT_SUFFIX="-kk-arjan-10"
 PROJECT_OUTPUT=$PROJECT/output$PROJECT_SUFFIX
 ### INPUT - AUDIO FILES:
-raw_input_audio_files=/vol/tensusers/ctejedor/multi_asr_pipeline/raw_arjan
+raw_input_audio_files=/vol/tensusers/ctejedor/multi_asr_pipeline/raw_arjan_10
 raw_input_audio_files_extension=.wav
 input_audio_files=$PROJECT/input$PROJECT_SUFFIX # FINAL-1: Here the audio files will be decoded
 input_audio_files_extension=.wav # Extension of the audio files to be decoded
 ### INPUT - TRANSCRIPTION FILES (optional)
 ### SET: input_transcriptions_ground_truth=- for not using SCLITE (only ASR decoding)
-input_transcriptions_ground_truth=/vol/tensusers/ctejedor/multi_asr_pipeline/raw_arjan
+#input_transcriptions_ground_truth=/vol/tensusers/ctejedor/multi_asr_pipeline/raw_transcriptions
+input_transcriptions_ground_truth=/vol/tensusers/ctejedor/multi_asr_pipeline/raw_arjan_10
+# The following variables will not make effect if input_transcriptions_ground_truth=-
 input_transcriptions_ground_truth_extension=.txt #.ctm or .txt
 input_transcriptions_ground_truth_remove_ids="0" # 3=CTM, 0=no modif, 1=remove slcite ids
 input_transcriptions_ground_truth_unk_symbol="<unk>"
@@ -63,7 +65,7 @@ input_transcriptions_ground_truth_std=$PROJECT/transcriptions$PROJECT_SUFFIX # F
 input_transcriptions_ground_truth_std_extension=.txt # Extension of the single-line txt files
 
 
-## CHANGE JUST ONCE, WHEN YOU SET-UP THIS PROJCT FOR THE FIRST TIME:
+## CHANGE JUST ONCE, WHEN YOU SET-UP THIS PROJECT FOR THE FIRST TIME:
 KALDI_NL_PATH=/vol/customopt/lamachine.stable/opt/kaldi_nl
 KALDI_LM_PATH=/vol/customopt/lamachine.stable/opt/kaldi
 SCLITE=$KALDI_LM_PATH/tools/sctk/bin/sclite 
@@ -160,17 +162,18 @@ then
     echo "--> Note: Audio files will be split in segments later only if you selected custom Kaldi ASR decoding"
     echo "--> Done " $(date)
     echo
+
+    if [ $kaldi_custom_v2_2022 -eq 1 ] || [ $kaldi_custom_v1_2023 -eq 1 ] || [ $kaldi_custom_v2_2023 -eq 1 ]; then
+        echo "+-+ 0.1.1 Split audio files with sox:"
+        echo $(date)
+        $PROJECT/scripts/utils/audio_split.sh "$input_audio_files" "$input_audio_files_extension" "$input_split_audio_files" "$input_split_audio_files_extension" "$input_split_audio_files_symbol"
+        echo "--> Done " $(date)
+    else
+        echo "0.1.1 --> Skipped"
+    fi
+
 else
     echo "0.1 --> Skipped"
-fi
-
-if [ $kaldi_custom_v2_2022 -eq 1 ] || [ $kaldi_custom_v1_2023 -eq 1 ] || [ $kaldi_custom_v2_2023 -eq 1 ]; then
-    echo "+-+ 0.1.1 Split audio files with sox:"
-    echo $(date)
-    $PROJECT/scripts/utils/audio_split.sh "$input_audio_files" "$input_audio_files_extension" "$input_split_audio_files" "$input_split_audio_files_extension" "$input_split_audio_files_symbol"
-    echo "--> Done " $(date)
-else
-    echo "0.1.1 --> Skipped"
 fi
 
 

@@ -44,7 +44,7 @@ python3 txt2sclite.py $OUTPUT_PATH $sclite_hyp_file $SPLIT_CONDITION $SPLIT_SYMB
 
 if [ -e "$SCLITE_REF_PATH" ]; then
     # 4. SCLITE COMMAND
-    $SCLITE -s -i rm -r $SCLITE_REF_PATH -h $sclite_hyp_file -o all dtl -n "whisper_t"
+    $SCLITE -s -i rm -r $SCLITE_REF_PATH -h $sclite_hyp_file -o all dtl -n "_whisper_t"
 else
     echo "Skipped SCLITE - whisper_t"
 fi

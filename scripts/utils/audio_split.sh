@@ -10,8 +10,8 @@ output_dir="$3"
 output_ext="$4"
 split_symbol="$5"
 
-# Silence is detected when the audio level drops below 1% for at least 0.6 seconds
-X=0.6
+# Silence is detected when the audio level drops below 1% for at least 0.3 seconds
+X=0.3
 Y=1
 # 0.3s of silence at the beginning and end of each split file for better ASR performance
 SOX_SIL_PAD=0.3 
@@ -30,6 +30,7 @@ for file in "$input_dir"/*$input_ext; do
     echo -n "$COUNTER "
 done
 
+echo
 echo "Changing the volume of all files split..."
 for file in "$output_dir_temp"/*$output_ext; do
   filename=$(basename "$file" $output_ext)

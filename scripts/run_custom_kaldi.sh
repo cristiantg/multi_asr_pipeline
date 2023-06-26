@@ -54,7 +54,7 @@ python3 txt2sclite.py $output_path $sclite_hyp_file $SPLIT_CONDITION $SPLIT_SYMB
 m_preffix=$(basename "$lm_models")
 if [ -e "$SCLITE_REF_PATH" ]; then
     # 4. SCLITE COMMAND
-    $SCLITE -s -i rm -r $SCLITE_REF_PATH -h $sclite_hyp_file -o all dtl -n "kaldi_$m_preffix"
+    $SCLITE -s -i rm -r $SCLITE_REF_PATH -h $sclite_hyp_file -o all dtl -n "_kaldi_$m_preffix"
 else
     echo "Skipped SCLITE - kaldi_$m_preffix"
 fi
