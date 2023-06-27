@@ -14,6 +14,7 @@ output_ext="$4"
 SOX_KHZ=16000
 SOX_CHANNELS=1
 SOX_BITS=16
+SOX_VOL=0.1
 mkdir -p $output_dir
 
 COUNTER=0
@@ -21,7 +22,7 @@ echo -n "Input files: "
 for file in "$input_dir"/*$input_ext; do
   filename=$(basename "$file" $input_ext)
   output_file="$output_dir/$filename$output_ext"
-  sox "$file" -r $SOX_KHZ -c $SOX_CHANNELS -b $SOX_BITS "$output_file"
+  sox -v "$SOX_VOL" "$file" -r $SOX_KHZ -c $SOX_CHANNELS -b $SOX_BITS "$output_file"
   COUNTER=$[$COUNTER +1]
   echo -n "$COUNTER "
 done

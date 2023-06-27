@@ -8,7 +8,7 @@
 #   1. One folder with audio files
 #   2. (Optional) One folder with UTF-8 single-line txt files (transcriptions)
 #   Note: It is possible to automatically obtain the standard transcriptions of the files from
-#   multi-line txt files, CTM files and JSON ("txt" field) files
+#   (1) multi-line txt files, (2) CTM files and (3) Whisper-t-based JSON ("txt" field) files
 #
 # OUTPUT:
 #   1. Subfolders with each ASR system output
@@ -21,7 +21,7 @@
 # vim uber.sh #change the paths of the ## CONSTANTS ##  accordingly
 #       (Optional) chmod 700 ./*
 #       (Optional) rm -r nohup.out ../input ../output
-# nohup time ./uber.sh >> nohup-kk-arjan.out &
+# nohup time ./uber.sh >> nohup-raw_MJ_full.out &
 #
 #
 # When all processes are done:
@@ -40,29 +40,25 @@
 
 ############################### CONSTANTS ###############################
 # Steps mega pipeline, change binary values accordingly: [0-1] -> 0 Skip, 1 Run.
-normalize_sox=1; prepare_ref=1;
-kaldi_nl=1; whisper_t=1; w2v2_gpu=1; kaldi_custom_v2_2022=0; kaldi_custom_v1_2023=0; kaldi_custom_v2_2023=0
+normalize_sox=1; split_segments=0; prepare_ref=1;
+kaldi_nl=1; whisper_t=1; w2v2_gpu=1; kaldi_custom_v2_2022=1; kaldi_custom_v1_2023=1; kaldi_custom_v2_2023=1
 
 # I. Please change the following values whenever you run this script:
-PROJECT=/vol/tensusers/ctejedor/multi_asr_pipeline # PATH TO THE GITHUB REPO
-PROJECT_SUFFIX="-kk-arjan-10"
+PROJECT=/vol/tensusers/ctejedor/multi_asr_pipeline # PATH TO THIS GITHUB REPO IN YOUR PC
+PROJECT_SUFFIX="-raw_MJ_full"
 PROJECT_OUTPUT=$PROJECT/output$PROJECT_SUFFIX
 ### INPUT - AUDIO FILES:
-raw_input_audio_files=/vol/tensusers/ctejedor/multi_asr_pipeline/raw_arjan_10
+raw_input_audio_files=/vol/tensusers4/ctejedor/lanewcristianmachine/opt/kaldi_nl/homed_wav
 raw_input_audio_files_extension=.wav
-input_audio_files=$PROJECT/input$PROJECT_SUFFIX # FINAL-1: Here the audio files will be decoded
-input_audio_files_extension=.wav # Extension of the audio files to be decoded
 ### INPUT - TRANSCRIPTION FILES (optional)
 ### SET: input_transcriptions_ground_truth=- for not using SCLITE (only ASR decoding)
-#input_transcriptions_ground_truth=/vol/tensusers/ctejedor/multi_asr_pipeline/raw_transcriptions
-input_transcriptions_ground_truth=/vol/tensusers/ctejedor/multi_asr_pipeline/raw_arjan_10
+input_transcriptions_ground_truth=/vol/tensusers4/ctejedor/lanewcristianmachine/opt/kaldi_nl/ctmator/ref_original
 # The following variables will not make effect if input_transcriptions_ground_truth=-
-input_transcriptions_ground_truth_extension=.txt #.ctm or .txt
-input_transcriptions_ground_truth_remove_ids="0" # 3=CTM, 0=no modif, 1=remove slcite ids
+input_transcriptions_ground_truth_extension=.ctm #.ctm, .txt, etc.
+input_transcriptions_ground_truth_remove_ids="3" # 0=no modif, 1=remove sclite ids at the end of the lines, 2="text" from json, 3=CTM
 input_transcriptions_ground_truth_unk_symbol="<unk>"
-# Place here all single-line txt files with the std transcriptions if you alreay have them, otherwise they will be calculated
-input_transcriptions_ground_truth_std=$PROJECT/transcriptions$PROJECT_SUFFIX # FINAL-2: These are the single-line txt files
-input_transcriptions_ground_truth_std_extension=.txt # Extension of the single-line txt files
+# A Kaldi-standard segments file is required for splitting audio files (you might obtain it first from kaldi_nl)
+input_split_audio_files_segments_file=$PROJECT_OUTPUT/kaldi_nl/intermediate/data/ALL/segments
 
 
 ## CHANGE JUST ONCE, WHEN YOU SET-UP THIS PROJECT FOR THE FIRST TIME:
@@ -105,11 +101,20 @@ kaldi_custom_v2_2023_unk_symbol="<unk>"
 OUTPUT_REF_FILE=$PROJECT_OUTPUT/ref.txt
 OUTPUT_STANDARD_TXT=output_std
 OUTPUT_STANDARD_TXT_EXTENSION=.txt
-input_split_audio_files=$input_audio_files-split
-input_split_audio_files_extension=$input_audio_files_extension
+input_audio_files=$PROJECT_OUTPUT/_input$PROJECT_SUFFIX # FINAL-1: Here the audio files will be decoded
+input_audio_files_extension=.wav # Extension of the audio files to be decoded
+input_transcriptions_ground_truth_std=$PROJECT_OUTPUT/_transcriptions$PROJECT_SUFFIX # FINAL-2: These are the single-line txt files
+input_transcriptions_ground_truth_std_extension=.txt # Extension of the single-line txt files
 input_split_audio_files_condition_true="1"
 input_split_audio_files_condition_false="0"
+input_split_audio_files_extension=$input_audio_files_extension
 input_split_audio_files_symbol="__"
+input_split_audio_files="$input_audio_files"
+input_split_audio_files_condition="$input_split_audio_files_condition_false"
+if [ $split_segments -eq 1 ]; then
+    input_split_audio_files="$input_audio_files-split"
+    input_split_audio_files_condition="$input_split_audio_files_condition_true"
+fi
 kaldi_nl_output=$PROJECT_OUTPUT/kaldi_nl
 kaldi_nl_output_std=$kaldi_nl_output/$OUTPUT_STANDARD_TXT
 kaldi_nl_decoded_extension=.txt
@@ -143,17 +148,27 @@ echo
 echo $(date)
 echo "++ uber.sh script ++"
 echo " --> input_audio_files: $input_audio_files"
-if [ $kaldi_custom_v2_2022 -eq 1 ] || [ $kaldi_custom_v1_2023 -eq 1 ] || [ $kaldi_custom_v2_2023 -eq 1 ]; then
+if [ $split_segments -eq 1 ]; then
     echo " --> input_split_audio_files: $input_split_audio_files"
-    echo " --> Cleaning the previous content..."
-    rm -rf $input_split_audio_files
+    if [ ! -f $input_split_audio_files_segments_file ]; then
+        echo "An existing Kaldi-based segments file is needed to split the audio files"
+        echo $(date)
+        echo "Aborted execution of uber.sh script."
+        echo
+        exit 2
+    fi
+
+    if [ $normalize_sox -eq 1 ]; then   
+        echo " ----> Cleaning the previous content..."
+        rm -rf $input_split_audio_files
+    fi
 fi
 echo " --> input_transcriptions_ground_truth_std: $input_transcriptions_ground_truth_std"
 echo
 
 if [ $normalize_sox -eq 1 ]
 then
-    echo "+-+ 0.1 Preparing audio files with sox:"
+    echo "+-+ 0.1.1 Preparing audio files with sox:"
     echo " INPUT (raw audio): $raw_input_audio_files"
     echo " OUTPUT (normalized audio files with sox): $input_audio_files"
     echo $(date)
@@ -163,17 +178,17 @@ then
     echo "--> Done " $(date)
     echo
 
-    if [ $kaldi_custom_v2_2022 -eq 1 ] || [ $kaldi_custom_v1_2023 -eq 1 ] || [ $kaldi_custom_v2_2023 -eq 1 ]; then
-        echo "+-+ 0.1.1 Split audio files with sox:"
+    if [ $split_segments -eq 1 ]; then
+        echo "+-+ 0.1.2 Split audio files with sox:"
         echo $(date)
-        $PROJECT/scripts/utils/audio_split.sh "$input_audio_files" "$input_audio_files_extension" "$input_split_audio_files" "$input_split_audio_files_extension" "$input_split_audio_files_symbol"
+        python3 utils/split_segments.py "$input_audio_files" "$input_split_audio_files" "$input_split_audio_files_segments_file" "$input_audio_files_extension" "$input_split_audio_files_symbol"
         echo "--> Done " $(date)
     else
-        echo "0.1.1 --> Skipped"
+        echo "0.1.2 --> Skipped"
     fi
 
 else
-    echo "0.1 --> Skipped"
+    echo "0.1.1 and 0.1.2 --> Skipped"
 fi
 
 
@@ -230,7 +245,7 @@ if [ $kaldi_custom_v2_2022 -eq 1 ]
 then
     echo "+-+ 4. KALDI_CUSTOM: HoMed-v2_2022" $(date)
     mkdir -p $kaldi_custom_v2_2022_output $kaldi_custom_v2_2022_output_files $kaldi_custom_v2_2022_output_std
-    nohup time $PROJECT/scripts/run_custom_kaldi.sh $kaldi_custom_v2_2022_output_files $KALDI_CGN $kaldi_custom_am_models_v2_2022 $input_split_audio_files $input_split_audio_files_extension $kaldi_custom_v2_2022_beam $kaldi_custom_lm_models_v2_2022 $kaldi_custom_v2_2022_remove_ids $kaldi_custom_v2_2022_unk_symbol $kaldi_custom_v2_2022_output_std $OUTPUT_STANDARD_TXT_EXTENSION $CTMATOR $LEXICONATOR $SCLITE $OUTPUT_REF_FILE $input_split_audio_files_condition_true $input_split_audio_files_symbol >> $kaldi_custom_v2_2022_nohup &
+    nohup time $PROJECT/scripts/run_custom_kaldi.sh $kaldi_custom_v2_2022_output_files $KALDI_CGN $kaldi_custom_am_models_v2_2022 $input_split_audio_files $input_split_audio_files_extension $kaldi_custom_v2_2022_beam $kaldi_custom_lm_models_v2_2022 $kaldi_custom_v2_2022_remove_ids $kaldi_custom_v2_2022_unk_symbol $kaldi_custom_v2_2022_output_std $OUTPUT_STANDARD_TXT_EXTENSION $CTMATOR $LEXICONATOR $SCLITE $OUTPUT_REF_FILE $input_split_audio_files_condition $input_split_audio_files_symbol >> $kaldi_custom_v2_2022_nohup &
 else
     echo "4 --> Skipped"
 fi
@@ -239,7 +254,7 @@ if [ $kaldi_custom_v1_2023 -eq 1 ]
 then
     echo "+-+ 5. KALDI_CUSTOM: HoMed-v1_2023: nivel-cgn.lex + utwente_0.2" $(date)
     mkdir -p $kaldi_custom_v1_2023_output $kaldi_custom_v1_2023_output_files $kaldi_custom_v1_2023_output_std
-    nohup time $PROJECT/scripts/run_custom_kaldi.sh $kaldi_custom_v1_2023_output_files $KALDI_CGN $kaldi_custom_am_models_v1_2023 $input_split_audio_files $input_split_audio_files_extension $kaldi_custom_v1_2023_beam $kaldi_custom_lm_models_v1_2023 $kaldi_custom_v1_2023_remove_ids $kaldi_custom_v1_2023_unk_symbol $kaldi_custom_v1_2023_output_std $OUTPUT_STANDARD_TXT_EXTENSION $CTMATOR $LEXICONATOR $SCLITE $OUTPUT_REF_FILE $input_split_audio_files_condition_true $input_split_audio_files_symbol >> $kaldi_custom_v1_2023_nohup &
+    nohup time $PROJECT/scripts/run_custom_kaldi.sh $kaldi_custom_v1_2023_output_files $KALDI_CGN $kaldi_custom_am_models_v1_2023 $input_split_audio_files $input_split_audio_files_extension $kaldi_custom_v1_2023_beam $kaldi_custom_lm_models_v1_2023 $kaldi_custom_v1_2023_remove_ids $kaldi_custom_v1_2023_unk_symbol $kaldi_custom_v1_2023_output_std $OUTPUT_STANDARD_TXT_EXTENSION $CTMATOR $LEXICONATOR $SCLITE $OUTPUT_REF_FILE $input_split_audio_files_condition $input_split_audio_files_symbol >> $kaldi_custom_v1_2023_nohup &
 else
     echo "5 --> Skipped"
 fi
@@ -248,7 +263,7 @@ if [ $kaldi_custom_v2_2023 -eq 1 ]
 then
     echo "+-+ 6. KALDI_CUSTOM: HoMed-v2_2023: nivel-cgn.lex + utwente_0.9" $(date)
     mkdir -p $kaldi_custom_v2_2023_output $kaldi_custom_v2_2023_output_files $kaldi_custom_v2_2023_output_std
-    nohup time $PROJECT/scripts/run_custom_kaldi.sh $kaldi_custom_v2_2023_output_files $KALDI_CGN $kaldi_custom_am_models_v2_2023 $input_split_audio_files $input_split_audio_files_extension $kaldi_custom_v2_2023_beam $kaldi_custom_lm_models_v2_2023 $kaldi_custom_v2_2023_remove_ids $kaldi_custom_v2_2023_unk_symbol $kaldi_custom_v2_2023_output_std $OUTPUT_STANDARD_TXT_EXTENSION $CTMATOR $LEXICONATOR $SCLITE $OUTPUT_REF_FILE $input_split_audio_files_condition_true $input_split_audio_files_symbol >> $kaldi_custom_v2_2023_nohup &
+    nohup time $PROJECT/scripts/run_custom_kaldi.sh $kaldi_custom_v2_2023_output_files $KALDI_CGN $kaldi_custom_am_models_v2_2023 $input_split_audio_files $input_split_audio_files_extension $kaldi_custom_v2_2023_beam $kaldi_custom_lm_models_v2_2023 $kaldi_custom_v2_2023_remove_ids $kaldi_custom_v2_2023_unk_symbol $kaldi_custom_v2_2023_output_std $OUTPUT_STANDARD_TXT_EXTENSION $CTMATOR $LEXICONATOR $SCLITE $OUTPUT_REF_FILE $input_split_audio_files_condition $input_split_audio_files_symbol >> $kaldi_custom_v2_2023_nohup &
 else
     echo "6 --> Skipped"
 fi

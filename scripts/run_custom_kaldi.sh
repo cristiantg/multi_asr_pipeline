@@ -24,7 +24,6 @@ SPLIT_SYMBOL="${17}"
 decoded_files_extension=.ctm
 sclite_hyp_file=$kaldi_custom_output_files/../hyp.txt
 
-
 # 1. DECODE
 echo "++ run_custom_kaldi.sh ++" $(date)
 prev_dir=$PWD
