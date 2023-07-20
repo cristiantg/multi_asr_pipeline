@@ -9,6 +9,7 @@ scripts/utils/LGdir*
 scripts/utils/graph_s*
 scripts/utils/s_graph*
 scripts/utils/nivel*
+scripts/*.out
 
 
 

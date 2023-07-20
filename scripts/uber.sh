@@ -39,8 +39,8 @@
 
 
 ############################### CONSTANTS ###############################
-# Steps mega pipeline, change binary values accordingly: [0-1] -> 0 Skip, 1 Run.
-normalize_sox=1; split_segments=0; prepare_ref=1;
+# Steps mega pipeline, change binary values accordingly: [0-1] -> 0=>Skip, 1=>Run.
+prepare_ref=1; normalize_sox=1; split_segments=0
 kaldi_nl=1; whisper_t=1; w2v2_gpu=1; kaldi_custom_v2_2022=1; kaldi_custom_v1_2023=1; kaldi_custom_v2_2023=1
 
 # I. Please change the following values whenever you run this script:
@@ -54,17 +54,20 @@ raw_input_audio_files_extension=.wav
 ### SET: input_transcriptions_ground_truth=- for not using SCLITE (only ASR decoding)
 input_transcriptions_ground_truth=/vol/tensusers4/ctejedor/lanewcristianmachine/opt/kaldi_nl/ctmator/ref_original
 # The following variables will not make effect if input_transcriptions_ground_truth=-
-input_transcriptions_ground_truth_extension=.ctm #.ctm, .txt, etc.
-input_transcriptions_ground_truth_remove_ids="3" # 0=no modif, 1=remove sclite ids at the end of the lines, 2="text" from json, 3=CTM
+input_transcriptions_ground_truth_extension=.txt #.ctm, .txt, .prompt, etc.
+input_transcriptions_ground_truth_remove_ids="0" # 0=no modif, 1=remove sclite ids at the end of the lines, 2="text" from json, 3=CTM
 input_transcriptions_ground_truth_unk_symbol="<unk>"
-# A Kaldi-standard segments file is required for splitting audio files (you might obtain it first from kaldi_nl)
+# Optional: A Kaldi-standard segments file is required for splitting audio files (you might obtain it first from kaldi_nl)
+# It only works if "split_segments=1"
 input_split_audio_files_segments_file=$PROJECT_OUTPUT/kaldi_nl/intermediate/data/ALL/segments
+# Optional: Folder with .prompt files, otherwise: WHISPER_T_PROMPTS_PATH=0
+WHISPER_T_PROMPTS_PATH=0
 
 
 ## CHANGE JUST ONCE, WHEN YOU SET-UP THIS PROJECT FOR THE FIRST TIME:
 KALDI_NL_PATH=/vol/customopt/lamachine.stable/opt/kaldi_nl
 KALDI_LM_PATH=/vol/customopt/lamachine.stable/opt/kaldi
-SCLITE=$KALDI_LM_PATH/tools/sctk/bin/sclite 
+SCLITE=$KALDI_LM_PATH/tools/sctk/bin/sclite
 CTMATOR=/vol/tensusers4/ctejedor/lanewcristianmachine/opt/kaldi_nl/ctmator
 LEXICONATOR=/home/ctejedor/python-scripts/lexiconator
 KALDI_CGN=/vol/tensusers4/ctejedor/lanewcristianmachine/opt/kaldi/egs/kaldi_egs_CGN/s5
@@ -74,7 +77,6 @@ WHISPER_T_PATH=/vol/tensusers5/ctejedor/whisper
 WHISPER_T_MODEL="large"
 WHISPER_T_MODELS=$WHISPER_T_PATH/models
 WHISPER_T_LANG=nl
-WHISPER_T_PROMPTS_PATH=0
 whisper_t_remove_ids="2" # extract "text" from json
 whisper_t_unk_symbol="<unk>"
 W2V2_GPU_REPO=/vol/tensusers/mbentum/AUDIOSERVER/
@@ -147,6 +149,31 @@ kaldi_custom_v2_2023_output_std=$kaldi_custom_v2_2023_output/$OUTPUT_STANDARD_TX
 echo
 echo $(date)
 echo "++ uber.sh script ++"
+directories="$KALDI_NL_PATH $KALDI_LM_PATH $CTMATOR $LEXICONATOR $KALDI_CGN 
+  $WHISPER_T_PATH $WHISPER_T_MODELS $W2V2_GPU_REPO $kaldi_custom_am_models_v2_2022 
+  $kaldi_custom_lm_models_v2_2022 $kaldi_custom_am_models_v1_2023 
+  $kaldi_custom_lm_models_v1_2023 $kaldi_custom_am_models_v2_2023 
+  $kaldi_custom_lm_models_v2_2023"
+
+for directory in $directories; do
+  if [ ! -d "$directory" ]; then
+    echo "Directory '$directory' does not exist"
+    echo "Aborted execution of uber.sh script."
+    echo
+    exit 2
+  fi
+done
+
+# Check file
+if [ ! -f "$SCLITE" ]; then
+  echo "File '$SCLITE' does not exist"
+  echo "Aborted execution of uber.sh script."
+  echo
+  exit 2
+fi
+
+
+
 echo " --> input_audio_files: $input_audio_files"
 if [ $split_segments -eq 1 ]; then
     echo " --> input_split_audio_files: $input_split_audio_files"
@@ -272,7 +299,7 @@ fi
 
 echo
 echo
-echo "Once all ASR systems are done, you might run:"
+echo "WER: Once all ASR systems are done, you might run:"
 echo "$PROJECT/scripts/utils/summary_sclite.sh $PROJECT_OUTPUT $PROJECT_OUTPUT/summary.txt"
 echo
 echo $(date)
